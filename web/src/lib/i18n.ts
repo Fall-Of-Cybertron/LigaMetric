@@ -614,6 +614,14 @@ const EXACT_TRANSLATIONS: Record<string, { en: string; de: string }> = {
     de: 'lieferte keine passenden Spieler, Vereine oder Spiele.',
   },
   '3. Bölge: %': { en: 'Final 3rd: %', de: 'Letztes Drittel: %' },
+  'Kuruluş:': { en: 'Founded:', de: 'Gegründet:' },
+  'Boy:': { en: 'Height:', de: 'Größe:' },
+  'Ayak:': { en: 'Foot:', de: 'Fuß:' },
+  'Yan Mevki:': { en: 'Secondary Pos:', de: 'Nebenposition:' },
+  'Zirve:': { en: 'Peak:', de: 'Höchstwert:' },
+  'Zirve': { en: 'Peak', de: 'Höchstwert' },
+  'Kariyer Değer Gelişimi': { en: 'Career Market Value Progression', de: 'Marktwertentwicklung' },
+  'Maç ·': { en: 'Matches ·', de: 'Spiele ·' },
 
   // Nationalities (TR -> EN / DE)
   'ABD': { en: 'United States', de: 'USA' },
@@ -904,8 +912,13 @@ function translateSegment(seg: string, lang: Exclude<Locale, 'tr'>): string {
   if ((m = seg.match(/^(\d+) Asist$/))) {
     return lang === 'en' ? `${m[1]} Assists` : `${m[1]} Vorlagen`;
   }
-  if ((m = seg.match(/^(\d+) Maç$/))) {
+  if ((m = seg.match(/^(\d+)\s+Maç$/i))) {
     return lang === 'en' ? `${m[1]} Matches` : `${m[1]} Spiele`;
+  }
+  if ((m = seg.match(/^(\d+)\s+ay kaldı(\s*·\s*Kritik)?$/))) {
+    return lang === 'en'
+      ? `${m[1]} months left${m[2] ? ' · Critical' : ''}`
+      : `${m[1]} Monate übrig${m[2] ? ' · Kritisch' : ''}`;
   }
   if ((m = seg.match(/^(\d+) Futbolcu$/))) {
     return lang === 'en' ? `${m[1]} Players` : `${m[1]} Spieler`;
@@ -997,6 +1010,9 @@ function translateSegment(seg: string, lang: Exclude<Locale, 'tr'>): string {
   if ((m = seg.match(/^Zirve:\s*(.+)$/))) {
     return lang === 'en' ? `Peak: ${m[1]}` : `Höchstwert: ${m[1]}`;
   }
+  if ((m = seg.match(/^Zirve\s+(.+)$/))) {
+    return lang === 'en' ? `Peak ${m[1]}` : `Höchstwert ${m[1]}`;
+  }
   if (seg.includes(', ')) {
     const parts = seg.split(',').map((item) => item.trim()).filter(Boolean);
     if (parts.length >= 2 && parts.every((item) => Boolean(EXACT_TRANSLATIONS[item]))) {
@@ -1028,6 +1044,11 @@ export function translateText(raw: string, lang: Locale): string {
   if (trimmed.startsWith('· ')) {
     const rest = trimmed.slice(2).trim();
     return `${leading}· ${translateSegment(rest, lang)}${trailing}`;
+  }
+
+  if (trimmed.endsWith(' ·')) {
+    const head = trimmed.slice(0, -2).trim();
+    return `${leading}${translateSegment(head, lang)} ·${trailing}`;
   }
 
   const single = translateSegment(trimmed, lang);
