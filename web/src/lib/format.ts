@@ -56,7 +56,7 @@ export function normalizeTr(input: string): string {
 }
 
 export function formatMarketValue(eur: number): string {
-  if (!eur || eur <= 0) return '€0';
+  if (!eur || eur <= 0) return '—';
   if (eur >= 1_000_000_000) {
     return `€${(eur / 1_000_000_000).toFixed(2)}B`;
   }
@@ -116,19 +116,23 @@ export function getPlayStyleBadgeClass(style: string): string {
 const REFERENCE_DATE = new Date('2026-11-17T00:00:00Z');
 
 export function getMonthsUntilExpiry(contractExpiry: string): number {
+  if (!contractExpiry || contractExpiry === '—') return -1;
   const exp = new Date(`${contractExpiry}T00:00:00Z`);
+  if (Number.isNaN(exp.getTime())) return -1;
   const diffDays = (exp.getTime() - REFERENCE_DATE.getTime()) / (1000 * 60 * 60 * 24);
   return Math.max(0, Math.round(diffDays / 30.44));
 }
 
 export function isContractExpiringWithinOneYear(contractExpiry: string): boolean {
+  if (!contractExpiry || contractExpiry === '—') return false;
   const exp = new Date(`${contractExpiry}T00:00:00Z`);
+  if (Number.isNaN(exp.getTime())) return false;
   const diffDays = (exp.getTime() - REFERENCE_DATE.getTime()) / (1000 * 60 * 60 * 24);
   return diffDays <= 365;
 }
 
 export function formatDateTr(isoDate: string): string {
-  if (!isoDate) return '-';
+  if (!isoDate || isoDate === '—') return '—';
   const parts = isoDate.split('-');
   if (parts.length !== 3) return isoDate;
   return `${parts[2]}.${parts[1]}.${parts[0]}`;

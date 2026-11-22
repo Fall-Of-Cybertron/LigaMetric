@@ -339,6 +339,306 @@ def _shorten_name(full_name: str) -> str:
     return full_name
 
 
+def _parse_dmy_to_iso(raw: Any) -> str:
+    """DD/MM/YYYY, DD.MM.YYYY veya İngilizce ay tarihini YYYY-MM-DD biçimine çevirir."""
+    s = str(raw or "").strip()
+    if not s or s in ("-", "—", "N/A"):
+        return "—"
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
+        return s
+    m = re.fullmatch(r"(\d{1,2})[./](\d{1,2})[./](\d{4})", s)
+    if m:
+        return f"{m.group(3)}-{m.group(2).zfill(2)}-{m.group(1).zfill(2)}"
+    for fmt in ("%b %d, %Y", "%B %d, %Y"):
+        try:
+            return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    return "—"
+
+
+def _compute_age_from_iso(iso_date: str) -> int:
+    """YYYY-MM-DD doğum tarihinden güncel yaşı hesaplar."""
+    if not iso_date or iso_date == "—":
+        return 0
+    try:
+        bday = datetime.strptime(iso_date, "%Y-%m-%d").date()
+    except ValueError:
+        return 0
+    today = datetime.now(timezone(timedelta(hours=3))).date()
+    return max(0, (today.year - bday.year) - ((today.month, today.day) < (bday.month, bday.day)))
+
+
+def _parse_height_cm(raw: Any) -> int:
+    """Örn. '1,96 m' veya '185 cm' değerini santimetre tam sayıya çevirir."""
+    if isinstance(raw, (int, float)) and raw > 0:
+        return int(round(raw * 100)) if raw < 3 else int(round(raw))
+    s = str(raw or "").replace("\xa0", " ").replace(",", ".").strip().lower()
+    m = re.search(r"(\d+(?:\.\d+)?)", s)
+    if not m:
+        return 0
+    val = float(m.group(1))
+    if "cm" not in s and 0 < val < 3.0:
+        return int(round(val * 100))
+    return int(round(val)) if 120 <= val <= 230 else 0
+
+
+def _parse_eur_amount(raw: Any) -> int:
+    """Örn. '€1.00M' veya '€800.00K' değerini Euro tam sayıya çevirir."""
+    if isinstance(raw, (int, float)):
+        return max(0, int(round(raw)))
+    s = str(raw or "").replace(",", ".").strip().lower()
+    if not s or "free" in s or s in ("-", "—", "n/a", "?"):
+        return 0
+    m = re.search(r"(\d+(?:\.\d+)?)\s*(bn|b|m|k)?", s)
+    if not m:
+        return 0
+    num = float(m.group(1))
+    unit = m.group(2) or ""
+    mult = {"bn": 1_000_000_000, "b": 1_000_000_000, "m": 1_000_000, "k": 1_000}.get(unit, 1)
+    return int(round(num * mult))
+
+
+def _map_foot(raw: Any) -> str:
+    s = str(raw or "").strip().lower()
+    if s in ("right", "sağ"):
+        return "Sağ"
+    if s in ("left", "sol"):
+        return "Sol"
+    if s in ("both", "two", "çift"):
+        return "Çift"
+    return "—"
+
+
+def _map_transfer_type(raw: Any, fee_raw: Any) -> str:
+    s = str(raw or "").strip().lower()
+    f = str(fee_raw or "").strip().lower()
+    if "loan" in s or "kiral" in s:
+        return "Kiralık"
+    if "youth" in s or "altyap" in s or "u19" in s or "u21" in s:
+        return "Altyapı"
+    if "free" in s or "free" in f or not fee_raw or fee_raw in ("-", "—"):
+        return "Bedelsiz"
+    return "Bonservis"
+
+
+_INJURY_REGION_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("head", ("head", "concussion", "nose", "jaw", "eye", "face", "cheek", "skull", "tooth", "ear")),
+    ("shoulder", ("shoulder", "collarbone", "clavicle", "acromioclavicular")),
+    ("chest_ribs", ("rib", "chest", "pneumothorax", "lung", "sternum")),
+    ("back", ("back", "spine", "lumbar", "sciatica", "vertebra", "neck")),
+    ("arm_wrist", ("arm", "elbow", "wrist", "hand", "finger", "thumb", "forearm")),
+    ("groin", ("groin", "adductor", "pubalgia", "hip", "pelvis", "abdomen", "hernia")),
+    ("thigh_front", ("thigh", "quadricep", "rectus femoris")),
+    ("hamstring", ("hamstring", "biceps femoris")),
+    ("knee", ("knee", "cruciate", "acl", "mcl", "lcl", "meniscus", "patella", "kneecap")),
+    ("calf", ("calf", "achilles", "soleus", "shin", "tibia", "fibula", "gastrocnemius")),
+    ("ankle_foot", ("ankle", "foot", "toe", "heel", "metatarsal", "plantar", "instep", "syndesmosis")),
+)
+
+
+def _classify_injury_reason(reason: str) -> tuple[str | None, str]:
+    """İngilizce sakatlık nedenini anatomi bölgesine veya sistemik kategoriye ayırır."""
+    low = reason.lower()
+    if any(k in low for k in ("ill", "flu", "virus", "fever", "cold", "corona", "covid", "sick", "infection")):
+        return None, "Hastalık"
+    if any(k in low for k in ("fitness", "fatigue", "tired")):
+        return None, "Kondisyon"
+    if any(k in low for k in ("rest", "knock-out rest")):
+        return None, "Dinlenme"
+    for region_id, keywords in _INJURY_REGION_KEYWORDS:
+        if any(kw in low for kw in keywords):
+            return region_id, ""
+    return "other", ""
+
+
+def _apply_real_player_profile(
+    p: dict[str, Any],
+    raw_prof: dict[str, Any],
+    clubs_by_norm: dict[str, str],
+) -> None:
+    """Highlightly /players/{id} gerçek profil verilerini oyuncu kaydına uygular."""
+    prof = raw_prof.get("profile") if isinstance(raw_prof.get("profile"), dict) else {}
+
+    best_full = str(prof.get("fullName") or raw_prof.get("name") or raw_prof.get("fullName") or "").strip()
+    if best_full and not re.match(r"^[A-ZÇĞİÖŞÜ]\.\s", best_full):
+        cur_full = str(p.get("fullName") or "")
+        if not cur_full or re.match(r"^[A-ZÇĞİÖŞÜ]\.\s", cur_full) or len(best_full) > len(cur_full):
+            p["fullName"] = best_full
+            p["name"] = _shorten_name(best_full) if " " in best_full else best_full
+
+    citizenship = str(prof.get("citizenship") or "").strip()
+    if citizenship:
+        p["citizenship"] = citizenship
+
+    foot = _map_foot(prof.get("foot"))
+    if foot != "—":
+        p["foot"] = foot
+
+    height_cm = _parse_height_cm(prof.get("height"))
+    if height_cm > 0:
+        p["height"] = height_cm
+
+    birth_iso = _parse_dmy_to_iso(prof.get("birthDate"))
+    if birth_iso != "—":
+        p["birthDate"] = birth_iso
+        age = _compute_age_from_iso(birth_iso)
+        if age > 0:
+            p["age"] = age
+
+    club_block = prof.get("club") if isinstance(prof.get("club"), dict) else {}
+    expiry_iso = _parse_dmy_to_iso(club_block.get("contractExpiry"))
+    if expiry_iso != "—":
+        p["contractExpiry"] = expiry_iso
+
+    pos_block = prof.get("position") if isinstance(prof.get("position"), dict) else {}
+    sec_pos = pos_block.get("secondary")
+    if isinstance(sec_pos, list):
+        p["positionSecondary"] = [str(x).strip() for x in sec_pos if x]
+    elif isinstance(sec_pos, str) and sec_pos.strip():
+        p["positionSecondary"] = [sec_pos.strip()]
+
+    # Market Value History & Peak/Current Value
+    mv_raw = raw_prof.get("marketValue") if isinstance(raw_prof.get("marketValue"), list) else []
+    mv_points: list[dict[str, Any]] = []
+    for item in mv_raw:
+        if not isinstance(item, dict):
+            continue
+        val = int(item.get("value") or 0)
+        rec_iso = _parse_dmy_to_iso(item.get("recordedDate"))
+        club_name = str(item.get("club") or "").strip()
+        if val <= 0 or rec_iso == "—":
+            continue
+        mv_points.append({
+            "recordedDate": rec_iso,
+            "value": val,
+            "clubId": resolve_club_id(club_name, clubs_by_norm) or "",
+            "club": club_name or "—",
+            "age": int(item.get("age") or p.get("age") or 0),
+        })
+    if mv_points:
+        mv_points.sort(key=lambda pt: pt["recordedDate"])
+        p["marketValueHistory"] = mv_points
+        p["currentMarketValueEur"] = mv_points[-1]["value"]
+        p["peakMarketValueEur"] = max(pt["value"] for pt in mv_points)
+
+    # Real Transfer History (including foreign clubs)
+    tr_raw = raw_prof.get("transfers") if isinstance(raw_prof.get("transfers"), list) else []
+    transfers: list[dict[str, Any]] = []
+    for tr in tr_raw:
+        if not isinstance(tr, dict):
+            continue
+        from_name = str(tr.get("from") or "—").strip()
+        to_name = str(tr.get("to") or "—").strip()
+        fee_raw = tr.get("fee")
+        fee_eur = _parse_eur_amount(fee_raw)
+        tr_type = _map_transfer_type(tr.get("type"), fee_raw)
+        fee_label = str(fee_raw).strip() if fee_raw else ("Kiralık" if tr_type == "Kiralık" else "Bedelsiz")
+        transfers.append({
+            "season": str(tr.get("season") or "—").strip(),
+            "transferDate": _parse_dmy_to_iso(tr.get("transferDate")),
+            "fromClubId": resolve_club_id(from_name, clubs_by_norm) or "",
+            "from": from_name,
+            "toClubId": resolve_club_id(to_name, clubs_by_norm) or "",
+            "to": to_name,
+            "fee": fee_label,
+            "feeEur": fee_eur,
+            "marketValue": _parse_eur_amount(tr.get("marketValue")),
+            "type": tr_type,
+        })
+    if transfers or "transfers" in raw_prof:
+        p["transfers"] = transfers
+
+    # Active Transfer Rumours (current only)
+    rum_block = raw_prof.get("rumours") if isinstance(raw_prof.get("rumours"), dict) else {}
+    cur_rums = rum_block.get("current") if isinstance(rum_block.get("current"), list) else []
+    rumours: list[dict[str, Any]] = []
+    for r in cur_rums:
+        if not isinstance(r, dict):
+            continue
+        r_club = str(r.get("club") or "").strip()
+        if not r_club:
+            continue
+        prob_raw = str(r.get("transferProbability") or "0").replace("%", "").strip()
+        prob = int(prob_raw) if prob_raw.isdigit() else 0
+        rumours.append({
+            "clubId": resolve_club_id(r_club, clubs_by_norm) or "",
+            "club": r_club,
+            "rumourDate": _parse_dmy_to_iso(r.get("rumourDate")),
+            "transferProbability": prob,
+            "source": "Transfermarkt",
+        })
+    if rumours or "rumours" in raw_prof:
+        p["rumours"] = rumours
+
+    # Real Injuries mapped into Anatomy Regions & Systemic Records
+    inj_raw = raw_prof.get("injuries") if isinstance(raw_prof.get("injuries"), list) else []
+    if inj_raw or "injuries" in raw_prof:
+        anatomy = {
+            r: {"count": 0, "totalDays": 0, "missedGames": 0, "heatLevel": 0, "records": []}
+            for r in ANATOMY_REGIONS
+        }
+        systemic: list[dict[str, Any]] = []
+        total_days = 0
+        total_missed = 0
+        total_cnt = 0
+
+        for inj in inj_raw:
+            if not isinstance(inj, dict):
+                continue
+            reason = str(inj.get("reason") or "Unknown").strip()
+            from_iso = _parse_dmy_to_iso(inj.get("fromDate"))
+            to_iso = _parse_dmy_to_iso(inj.get("toDate"))
+            days = int(inj.get("absentDurationInDays") or 0)
+            missed = int(inj.get("missedGames") or 0)
+            total_days += days
+            total_missed += missed
+            total_cnt += 1
+
+            reg_id, sys_cat = _classify_injury_reason(reason)
+            if reg_id is None:
+                systemic.append({
+                    "reason": reason,
+                    "category": sys_cat,
+                    "fromDate": from_iso,
+                    "toDate": to_iso,
+                    "days": days,
+                    "missedGames": missed,
+                    "clubId": p["clubId"],
+                    "clubName": p["clubName"],
+                })
+            else:
+                slot = anatomy[reg_id]
+                slot["count"] += 1
+                slot["totalDays"] += days
+                slot["missedGames"] += missed
+                slot["records"].append({
+                    "reason": reason,
+                    "fromDate": from_iso,
+                    "toDate": to_iso,
+                    "days": days,
+                    "missedGames": missed,
+                    "clubId": p["clubId"],
+                    "clubName": p["clubName"],
+                })
+
+        for slot in anatomy.values():
+            c = slot["count"]
+            slot["heatLevel"] = 3 if c >= 3 else 2 if c == 2 else 1 if c == 1 else 0
+
+        p["injuries"] = {"anatomyRegions": anatomy, "systemicRecords": systemic}
+        if total_cnt == 0:
+            p["injuryRisk"] = "Düşük"
+        elif total_missed >= 25 or total_days >= 180 or total_cnt >= 6:
+            p["injuryRisk"] = "Kritik"
+        elif total_missed >= 12 or total_days >= 90 or total_cnt >= 4:
+            p["injuryRisk"] = "Yüksek"
+        elif total_missed >= 4 or total_days >= 21 or total_cnt >= 2:
+            p["injuryRisk"] = "Orta"
+        else:
+            p["injuryRisk"] = "Düşük"
+
+
 def _create_player_record(
     player_id: str,
     full_name: str,
@@ -349,37 +649,29 @@ def _create_player_record(
     shirt_no: int,
     seed_template: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    anatomy = (
-        seed_template["injuries"]["anatomyRegions"]
-        if seed_template
-        else {
-            r: {"count": 0, "totalDays": 0, "missedGames": 0, "heatLevel": 0, "records": []}
-            for r in ANATOMY_REGIONS
-        }
-    )
-    systemic = seed_template["injuries"]["systemicRecords"] if seed_template else []
-    mv = seed_template["currentMarketValueEur"] if seed_template else (4500000 if pos_group == "FW" else 2800000)
-    peak_mv = seed_template["peakMarketValueEur"] if seed_template else int(mv * 1.4)
-
+    anatomy = {
+        r: {"count": 0, "totalDays": 0, "missedGames": 0, "heatLevel": 0, "records": []}
+        for r in ANATOMY_REGIONS
+    }
     return {
         "id": player_id,
         "name": _shorten_name(full_name) if " " in full_name else full_name,
         "fullName": full_name,
-        "shirtNumber": shirt_no or (seed_template["shirtNumber"] if seed_template else 99),
+        "shirtNumber": shirt_no or 99,
         "clubId": club_id,
         "clubName": club_name,
         "positionMain": pos_main,
         "positionGroup": pos_group,
-        "positionSecondary": seed_template["positionSecondary"] if seed_template else [],
-        "foot": seed_template["foot"] if seed_template else "Sağ",
-        "height": seed_template["height"] if seed_template else 182,
-        "birthDate": seed_template["birthDate"] if seed_template else "1999-05-15",
-        "age": seed_template["age"] if seed_template else 26,
-        "citizenship": seed_template["citizenship"] if seed_template else "Türkiye",
-        "contractExpiry": seed_template["contractExpiry"] if seed_template else "2028-06-30",
-        "currentMarketValueEur": mv,
-        "peakMarketValueEur": peak_mv,
-        "injuryRisk": seed_template["injuryRisk"] if seed_template else "Düşük",
+        "positionSecondary": [],
+        "foot": "—",
+        "height": 0,
+        "birthDate": "—",
+        "age": 0,
+        "citizenship": "—",
+        "contractExpiry": "—",
+        "currentMarketValueEur": 0,
+        "peakMarketValueEur": 0,
+        "injuryRisk": "Düşük",
         "gamesPlayed": 0,
         "minutesPlayed": 0,
         "goals": 0,
@@ -391,30 +683,27 @@ def _create_player_record(
         "avgMatchRating": 7.05,
         "per90Goals": 0.0,
         "per90Assists": 0.0,
-        "passAccuracy": seed_template["passAccuracy"] if seed_template else 80.5,
+        "passAccuracy": 80.5,
         "keyPassesPer90": 0.0,
         "progressiveActionsPer90": 3.6,
         **({"cleanSheets": 0, "savePercentage": 74.0, "PSxG_plus_minus": 1.5} if pos_group == "GK" else {}),
-        "marketValueHistory": seed_template["marketValueHistory"] if seed_template else [
-            {"recordedDate": "2024-06-01", "value": int(mv * 0.75), "clubId": club_id, "club": club_name, "age": 24},
-            {"recordedDate": "2026-10-15", "value": mv, "clubId": club_id, "club": club_name, "age": 26},
-        ],
-        "transfers": seed_template["transfers"] if seed_template else [],
-        "rumours": seed_template["rumours"] if seed_template else [],
-        "perClub": seed_template["perClub"] if seed_template else [
+        "marketValueHistory": [],
+        "transfers": [],
+        "rumours": [],
+        "perClub": [
             {
                 "clubId": club_id,
                 "clubName": club_name,
                 "competition": "Süper Lig",
                 "seasonRange": "2026/27",
-                "games": 1,
-                "minutes": 90,
+                "games": 0,
+                "minutes": 0,
                 "goals": 0,
                 "assists": 0,
                 "avgRating": 7.05,
             }
         ],
-        "injuries": {"anatomyRegions": anatomy, "systemicRecords": systemic},
+        "injuries": {"anatomyRegions": anatomy, "systemicRecords": []},
     }
 
 
@@ -466,6 +755,7 @@ def merge_bronze_into_gold() -> dict[str, int]:
         for pid, url in (media_cache.get("player_photos") or {}).items()
         if isinstance(url, str) and url.startswith("http")
     }
+    player_profiles_by_id: dict[str, dict[str, Any]] = {}
     players_bronze_dir = BRONZE_DIR / "players"
     if players_bronze_dir.exists():
         for pf in sorted(players_bronze_dir.glob("player_*.json")):
@@ -476,9 +766,11 @@ def merge_bronze_into_gold() -> dict[str, int]:
                 p_raw = json.loads(pf.read_text(encoding="utf-8"))
                 p_items = unwrap_data(p_raw)
                 if p_items and isinstance(p_items[0], dict):
+                    canon_pid = f"hl-{m_pid.group(1)}"
+                    player_profiles_by_id[canon_pid] = p_items[0]
                     p_url = p_items[0].get("logo") or p_items[0].get("photo") or p_items[0].get("image")
                     if isinstance(p_url, str) and p_url.startswith("http"):
-                        photo_map.setdefault(f"hl-{m_pid.group(1)}", p_url)
+                        photo_map.setdefault(canon_pid, p_url)
             except (OSError, json.JSONDecodeError):
                 continue
 
@@ -1538,6 +1830,21 @@ def merge_bronze_into_gold() -> dict[str, int]:
             p["cleanSheets"] = gka["clean_sheets"]
             p["savePercentage"] = round((gka["saves"] / total_faced) * 100, 1)
             p["PSxG_plus_minus"] = round(gka["opp_xg"] - gka["conceded"], 1)
+        p["perClub"] = [
+            {
+                "clubId": p["clubId"],
+                "clubName": p["clubName"],
+                "competition": "Süper Lig",
+                "seasonRange": "2026/27",
+                "games": p["gamesPlayed"],
+                "minutes": p["minutesPlayed"],
+                "goals": goals,
+                "assists": assists,
+                "avgRating": avg_r,
+            }
+        ]
+        if p["id"] in player_profiles_by_id:
+            _apply_real_player_profile(p, player_profiles_by_id[p["id"]], clubs_by_norm)
         final_players.append(p)
 
     # Keep seed players ONLY for Super Lig clubs that don't have a real lineup downloaded yet
@@ -1601,7 +1908,10 @@ def merge_bronze_into_gold() -> dict[str, int]:
                         "assists": p["assists"],
                         "xG": p["xG"],
                         "injuryRisk": p["injuryRisk"],
-                        "missedGamesTotal": 0,
+                        "missedGamesTotal": (
+                            sum(r["missedGames"] for r in p["injuries"]["anatomyRegions"].values())
+                            + sum(s["missedGames"] for s in p["injuries"]["systemicRecords"])
+                        ),
                     }
                     for p in club_players
                 ],
@@ -1609,8 +1919,11 @@ def merge_bronze_into_gold() -> dict[str, int]:
                 reverse=True,
             )
             if club_players:
-                c["totalMarketValueEur"] = sum(p["currentMarketValueEur"] for p in club_players)
-                c["averageAge"] = round(sum(p["age"] for p in club_players) / len(club_players), 1)
+                c["totalMarketValueEur"] = sum(
+                    p["currentMarketValueEur"] for p in club_players if p["currentMarketValueEur"] > 0
+                )
+                ages_known = [p["age"] for p in club_players if p["age"] > 0]
+                c["averageAge"] = round(sum(ages_known) / len(ages_known), 1) if ages_known else 0
             dna = club_dna_acc.get(c["id"])
             if dna and dna["matches"] > 0:
                 mcnt = dna["matches"]
@@ -1679,11 +1992,20 @@ def merge_bronze_into_gold() -> dict[str, int]:
                 for fx in club_fx
             ]
 
-    # Ensure every partner club referenced in transfers/rumours/perClub exists in clubs_list
+    # Keep only valid clubIds for links while preserving foreign transfer & market history
     valid_club_ids = {c["id"] for c in clubs_list}
     for p in final_players:
-        p["transfers"] = [t for t in p.get("transfers", []) if t["fromClubId"] in valid_club_ids and t["toClubId"] in valid_club_ids]
-        p["rumours"] = [r for r in p.get("rumours", []) if r["clubId"] in valid_club_ids]
+        for tr in p.get("transfers", []):
+            if tr.get("fromClubId") not in valid_club_ids:
+                tr["fromClubId"] = ""
+            if tr.get("toClubId") not in valid_club_ids:
+                tr["toClubId"] = ""
+        for rum in p.get("rumours", []):
+            if rum.get("clubId") not in valid_club_ids:
+                rum["clubId"] = ""
+        for pt in p.get("marketValueHistory", []):
+            if pt.get("clubId") not in valid_club_ids:
+                pt["clubId"] = ""
         p["perClub"] = [pc for pc in p.get("perClub", []) if pc["clubId"] in valid_club_ids]
 
     standings_path.write_text(json.dumps(standings_doc, indent=2, ensure_ascii=False), encoding="utf-8")

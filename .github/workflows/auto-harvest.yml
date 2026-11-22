@@ -59,7 +59,11 @@ jobs:
         run: |
           python backend/turso_client.py pull-bronze
           BUDGET="${{ github.event.inputs.batch_budget || '240' }}"
-          python backend/auto_harvester.py --batch-budget "$BUDGET" --refresh-feeds
+          PROFILE_FLAG=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event.schedule }}" = "0 4 * * *" ]; then
+            PROFILE_FLAG="--harvest-profiles"
+          fi
+          python backend/auto_harvester.py --batch-budget "$BUDGET" --refresh-feeds $PROFILE_FLAG
           python backend/media_enrichment.py --max-matches 25 --max-players 50
           python backend/sync_highlightly.py merge
 

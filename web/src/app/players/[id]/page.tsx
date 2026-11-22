@@ -91,10 +91,15 @@ export default function PlayerDetailPage({ params }: { params: { id: string } })
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-400">
                 <span className="inline-flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-cyan-400" />
-                  {player.citizenship} · <span className="tabular-nums">{player.age} yaş</span> (
-                  {formatDateTr(player.birthDate)})
+                  {player.citizenship} ·{' '}
+                  <span className="tabular-nums">{player.age > 0 ? `${player.age} yaş` : '—'}</span>
+                  {player.birthDate && player.birthDate !== '—'
+                    ? ` (${formatDateTr(player.birthDate)})`
+                    : ''}
                 </span>
-                <span className="tabular-nums">Boy: {player.height} cm</span>
+                <span className="tabular-nums">
+                  Boy: {player.height > 0 ? `${player.height} cm` : '—'}
+                </span>
                 <span>Ayak: {player.foot}</span>
                 {player.positionSecondary.length > 0 && (
                   <span>Yan Mevki: {player.positionSecondary.join(', ')}</span>
@@ -128,7 +133,9 @@ export default function PlayerDetailPage({ params }: { params: { id: string } })
                 {formatDateTr(player.contractExpiry)}
               </div>
               <div className="tabular-nums text-[11px] text-slate-400">
-                {monthsLeft} ay kaldı {expiringSoon ? '· Kritik' : ''}
+                {monthsLeft >= 0
+                  ? `${monthsLeft} ay kaldı${expiringSoon ? ' · Kritik' : ''}`
+                  : '—'}
               </div>
             </div>
 

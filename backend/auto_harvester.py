@@ -114,8 +114,14 @@ def ensure_historical_standings(client: HighlightlyClient, league_id: str = "173
         )
 
 
-def harvest_player_profiles_if_spare_quota(client: HighlightlyClient) -> int:
-    """Tüm oynanmış maçlar tamamlandığında artan kota ile eksik oyuncu profillerini çeker."""
+def harvest_player_profiles_if_spare_quota(
+    client: HighlightlyClient,
+    reserve_quota: int = 60,
+    ttl_days: int = 7,
+    max_missing: int = 180,
+    max_refresh: int = 75,
+) -> int:
+    """Maç rezervi düşüldükten sonra eksik ve süresi (7 gün) dolmuş oyuncu profillerini çeker."""
     players_path = GOLD_DIR / "players.json"
     if not players_path.exists():
         return 0
@@ -123,8 +129,12 @@ def harvest_player_profiles_if_spare_quota(client: HighlightlyClient) -> int:
     players_gold = json.loads(players_path.read_text(encoding="utf-8"))
     media_cache = load_media_cache()
     players_dir = BRONZE_DIR / "players"
+    now_ts = time.time()
+    ttl_seconds = ttl_days * 86400
 
-    candidates = []
+    missing_candidates: list[tuple[int, int, str, int]] = []
+    stale_candidates: list[tuple[float, int, str, int]] = []
+
     for p in players_gold:
         pid = str(p.get("id") or "")
         if not pid.startswith("hl-"):
@@ -132,20 +142,32 @@ def harvest_player_profiles_if_spare_quota(client: HighlightlyClient) -> int:
         raw_id = pid[3:]
         if not raw_id.isdigit():
             continue
-        if media_cache.get("player_photos", {}).get(pid):
-            continue
-        if (players_dir / f"player_{raw_id}.json").exists():
-            continue
-        candidates.append((int(p.get("gamesPlayed") or 0), int(p.get("currentMarketValueEur") or 0), pid, int(raw_id)))
+        games = int(p.get("gamesPlayed") or 0)
+        mv = int(p.get("currentMarketValueEur") or 0)
+        pfile = players_dir / f"player_{raw_id}.json"
+        if not pfile.exists():
+            missing_candidates.append((games, mv, pid, int(raw_id)))
+        else:
+            age_sec = now_ts - pfile.stat().st_mtime
+            if age_sec > ttl_seconds:
+                stale_candidates.append((pfile.stat().st_mtime, -games, pid, int(raw_id)))
 
-    candidates.sort(reverse=True)
+    missing_candidates.sort(reverse=True)
+    stale_candidates.sort()
+
     fetched = 0
     photos_updated = False
 
-    for _, _, pid, hl_pid in candidates:
-        if client.budget_stopped or client.total_remaining_safe_quota() <= 0:
-            break
-        res = client.get(f"/players/{hl_pid}", cache_group="players", cache_name=f"player_{hl_pid}")
+    def _fetch_profile(pid: str, hl_pid: int, force_refresh: bool) -> bool:
+        nonlocal fetched, photos_updated
+        if client.budget_stopped or client.total_remaining_safe_quota() <= reserve_quota:
+            return False
+        res = client.get(
+            f"/players/{hl_pid}",
+            cache_group="players",
+            cache_name=f"player_{hl_pid}",
+            force_refresh=force_refresh,
+        )
         fetched += 1
         items = unwrap_data(res)
         if items and isinstance(items[0], dict):
@@ -153,6 +175,18 @@ def harvest_player_profiles_if_spare_quota(client: HighlightlyClient) -> int:
             if isinstance(photo, str) and photo.startswith("http"):
                 media_cache.setdefault("player_photos", {})[pid] = photo
                 photos_updated = True
+        return True
+
+    # 1) Öncelik: Profili hiç olmayan oyuncular
+    for _, _, pid, hl_pid in missing_candidates[:max_missing]:
+        if not _fetch_profile(pid, hl_pid, force_refresh=False):
+            break
+
+    # 2) Öncelik: TTL (7 gün) süresi dolmuş profiller
+    if not client.budget_stopped and client.total_remaining_safe_quota() > reserve_quota:
+        for _, _, pid, hl_pid in stale_candidates[:max_refresh]:
+            if not _fetch_profile(pid, hl_pid, force_refresh=True):
+                break
 
     if photos_updated:
         save_media_cache(media_cache)
@@ -164,6 +198,7 @@ def run_batch(
     refresh_feeds: bool,
     run_build: bool,
     season: str,
+    harvest_profiles: bool = False,
 ) -> tuple[int, int]:
     client = HighlightlyClient(max_requests_per_run=batch_budget)
 
@@ -188,10 +223,10 @@ def run_batch(
                 break
             client.get(f"/lineups/{mid}", cache_group="lineups", cache_name=f"lineup_{mid}")
 
-        if not pending and not client.budget_stopped and client.total_remaining_safe_quota() > 0:
+        if harvest_profiles and not pending and not client.budget_stopped and client.total_remaining_safe_quota() > 60:
             pf_count = harvest_player_profiles_if_spare_quota(client)
             if pf_count > 0:
-                print(f"[AutoHarvester] Artan kota ile {pf_count} oyuncu profili (/players) tarandı.")
+                print(f"[AutoHarvester] Artan kota ile {pf_count} oyuncu profili (/players) çekildi/yenilendi.")
     except RuntimeError as err:
         print(f"[AutoHarvester] Kota sınırı uyarısı: {err}")
 
@@ -217,6 +252,7 @@ def main() -> None:
     parser.add_argument("--interval-seconds", type=int, default=180, help="--loop modunda partiler arası bekleme süresi (sn)")
     parser.add_argument("--loop", action="store_true", help="Bekleyen maçlar bitene veya kota dolana kadar arka planda çalıştır")
     parser.add_argument("--refresh-feeds", action="store_true", help="Güncel puan durumu, fikstür ve özet listesini de yenile")
+    parser.add_argument("--harvest-profiles", action="store_true", help="Rezerv üstü kota ile eksik ve 7+ günlük oyuncu profillerini çek/yenile")
     parser.add_argument("--build", action="store_true", help="Yeni veri indiğinde web/ npm run build çalıştır")
     parser.add_argument("--season", type=str, default=os.environ.get("SUPER_LIG_SEASON", "2026"))
 
@@ -237,6 +273,7 @@ def main() -> None:
             refresh_feeds=args.refresh_feeds,
             run_build=args.build,
             season=args.season,
+            harvest_profiles=args.harvest_profiles,
         )
         return
 
@@ -252,6 +289,7 @@ def main() -> None:
             refresh_feeds=args.refresh_feeds,
             run_build=args.build,
             season=args.season,
+            harvest_profiles=args.harvest_profiles,
         )
         if pending_count == 0:
             print("[AutoHarvester] Tüm oynanmış Süper Lig maçlarının detayları başarıyla tamamlandı!")

@@ -126,7 +126,9 @@ export function ClubSquadTable({ squad }: ClubSquadTableProps) {
                     </Link>
                   </td>
                   <td className="px-3 py-2.5 text-slate-300 whitespace-nowrap">{m.positionMain}</td>
-                  <td className="px-2.5 py-2.5 text-center tabular-nums text-slate-300">{m.age}</td>
+                  <td className="px-2.5 py-2.5 text-center tabular-nums text-slate-300">
+                    {m.age > 0 ? m.age : '—'}
+                  </td>
                   <td className="px-3 py-2.5 text-slate-300 whitespace-nowrap">{m.citizenship}</td>
                   <td className="px-2.5 py-2.5 text-center text-slate-400">{m.foot}</td>
                   <td className="px-3 py-2.5 whitespace-nowrap">

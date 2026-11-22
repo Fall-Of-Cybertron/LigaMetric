@@ -487,22 +487,30 @@ export function PlayerProfileTabs({ player, clubName }: PlayerProfileTabsProps) 
                             {formatDateTr(tr.transferDate)}
                           </td>
                           <td className="px-3 py-2.5">
-                            <Link
-                              href={`/clubs/${tr.fromClubId}`}
-                              className="inline-flex items-center gap-1.5 text-slate-300 hover:text-cyan-300"
-                            >
-                              <ClubBadge clubId={tr.fromClubId} size="xs" />
-                              <span>{tr.from}</span>
-                            </Link>
+                            {tr.fromClubId ? (
+                              <Link
+                                href={`/clubs/${tr.fromClubId}`}
+                                className="inline-flex items-center gap-1.5 text-slate-300 hover:text-cyan-300"
+                              >
+                                <ClubBadge clubId={tr.fromClubId} size="xs" />
+                                <span>{tr.from}</span>
+                              </Link>
+                            ) : (
+                              <span className="text-slate-300">{tr.from}</span>
+                            )}
                           </td>
                           <td className="px-3 py-2.5">
-                            <Link
-                              href={`/clubs/${tr.toClubId}`}
-                              className="inline-flex items-center gap-1.5 font-semibold text-slate-100 hover:text-cyan-300"
-                            >
-                              <ClubBadge clubId={tr.toClubId} size="xs" />
-                              <span>{tr.to}</span>
-                            </Link>
+                            {tr.toClubId ? (
+                              <Link
+                                href={`/clubs/${tr.toClubId}`}
+                                className="inline-flex items-center gap-1.5 font-semibold text-slate-100 hover:text-cyan-300"
+                              >
+                                <ClubBadge clubId={tr.toClubId} size="xs" />
+                                <span>{tr.to}</span>
+                              </Link>
+                            ) : (
+                              <span className="font-semibold text-slate-100">{tr.to}</span>
+                            )}
                           </td>
                           <td className="px-3 py-2.5 text-right tabular-nums text-slate-400">
                             {formatMarketValue(tr.marketValue)}
@@ -546,13 +554,17 @@ export function PlayerProfileTabs({ player, clubName }: PlayerProfileTabsProps) 
                       className="rounded-xl border border-[#1F2937] bg-[#090D16]/80 p-3 space-y-2"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <Link
-                          href={`/clubs/${r.clubId}`}
-                          className="inline-flex items-center gap-2 text-xs font-bold text-slate-100 hover:text-cyan-300"
-                        >
-                          <ClubBadge clubId={r.clubId} size="xs" />
-                          <span>{r.club}</span>
-                        </Link>
+                        {r.clubId ? (
+                          <Link
+                            href={`/clubs/${r.clubId}`}
+                            className="inline-flex items-center gap-2 text-xs font-bold text-slate-100 hover:text-cyan-300"
+                          >
+                            <ClubBadge clubId={r.clubId} size="xs" />
+                            <span>{r.club}</span>
+                          </Link>
+                        ) : (
+                          <span className="text-xs font-bold text-slate-100">{r.club}</span>
+                        )}
                         <span className="tabular-nums text-xs font-bold text-cyan-300">
                           %{r.transferProbability}
                         </span>

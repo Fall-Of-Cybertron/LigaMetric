@@ -70,16 +70,21 @@ export function MarketValueTimeline({ history, peakValueEur }: MarketValueTimeli
       {activePoint && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#1F2937] bg-[#090D16] px-4 py-2.5 text-xs">
           <div className="flex items-center gap-3">
-            <ClubBadge clubId={activePoint.pt.clubId} size="sm" />
+            {activePoint.pt.clubId && <ClubBadge clubId={activePoint.pt.clubId} size="sm" />}
             <div>
-              <Link
-                href={`/clubs/${activePoint.pt.clubId}`}
-                className="font-bold text-slate-100 hover:text-cyan-300"
-              >
-                {activePoint.pt.club}
-              </Link>
+              {activePoint.pt.clubId ? (
+                <Link
+                  href={`/clubs/${activePoint.pt.clubId}`}
+                  className="font-bold text-slate-100 hover:text-cyan-300"
+                >
+                  {activePoint.pt.club}
+                </Link>
+              ) : (
+                <span className="font-bold text-slate-100">{activePoint.pt.club}</span>
+              )}
               <div className="text-[11px] text-slate-400 tabular-nums">
-                {formatDateTr(activePoint.pt.recordedDate)} · {activePoint.pt.age} yaş
+                {formatDateTr(activePoint.pt.recordedDate)}
+                {activePoint.pt.age > 0 ? ` · ${activePoint.pt.age} yaş` : ''}
               </div>
             </div>
           </div>
