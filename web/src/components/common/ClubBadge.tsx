@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getClubById } from '@/lib/data';
 
 interface ClubBadgeProps {
@@ -17,9 +17,23 @@ const SIZE_CLASSES = {
 
 export function ClubBadge({ clubId, size = 'sm' }: ClubBadgeProps) {
   const club = getClubById(clubId);
-  const [imgError, setImgError] = useState(false);
-
   const logoUrl = club?.logo;
+  const [imgError, setImgError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    setImgError(false);
+    setRetryCount(0);
+  }, [logoUrl]);
+
+  const handleImgError = () => {
+    if (retryCount < 1) {
+      setTimeout(() => setRetryCount((c) => c + 1), 800);
+    } else {
+      setImgError(true);
+    }
+  };
+
   const hasRemoteLogo = Boolean(logoUrl && logoUrl.startsWith('http') && !imgError);
 
   if (hasRemoteLogo) {
@@ -28,10 +42,11 @@ export function ClubBadge({ clubId, size = 'sm' }: ClubBadgeProps) {
         className={`inline-flex shrink-0 items-center justify-center rounded-lg bg-[#090D16]/80 border border-[#1F2937] p-0.5 overflow-hidden select-none ${SIZE_CLASSES[size]}`}
       >
         <img
+          key={retryCount}
           src={logoUrl}
           alt={`${club?.name ?? clubId} arması`}
-          loading="lazy"
-          onError={() => setImgError(true)}
+          referrerPolicy="no-referrer"
+          onError={handleImgError}
           className="h-full w-full object-contain drop-shadow-[0_0_2px_rgba(255,255,255,0.28)]"
         />
       </span>

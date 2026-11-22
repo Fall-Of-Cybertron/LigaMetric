@@ -321,15 +321,369 @@ def _slugify_player(name: str, club_id: str) -> str:
     return f"{club_id}-{clean}" if clean else f"{club_id}-player"
 
 
-def _map_pos(pos_raw: str) -> tuple[str, str]:
-    p = pos_raw.lower()
+POSITION_TR_MAP: dict[str, tuple[str, str]] = {
+    "goalkeeper": ("Kaleci", "GK"),
+    "centre-back": ("Stoper", "DF"),
+    "center-back": ("Stoper", "DF"),
+    "left-back": ("Sol Bek", "DF"),
+    "right-back": ("Sağ Bek", "DF"),
+    "defender": ("Defans", "DF"),
+    "defensive midfield": ("Ön Libero", "MF"),
+    "central midfield": ("Merkez Orta Saha", "MF"),
+    "attacking midfield": ("On Numara", "MF"),
+    "left midfield": ("Sol Orta Saha", "MF"),
+    "right midfield": ("Sağ Orta Saha", "MF"),
+    "midfield": ("Orta Saha", "MF"),
+    "left winger": ("Sol Kanat", "FW"),
+    "right winger": ("Sağ Kanat", "FW"),
+    "centre-forward": ("Santrafor", "FW"),
+    "center-forward": ("Santrafor", "FW"),
+    "second striker": ("İkinci Forvet", "FW"),
+    "striker": ("Forvet", "FW"),
+    "forward": ("Forvet", "FW"),
+}
+
+COUNTRY_TR_MAP: dict[str, str] = {
+    "albania": "Arnavutluk",
+    "algeria": "Cezayir",
+    "angola": "Angola",
+    "argentina": "Arjantin",
+    "armenia": "Ermenistan",
+    "australia": "Avustralya",
+    "austria": "Avusturya",
+    "azerbaijan": "Azerbaycan",
+    "belgium": "Belçika",
+    "benin": "Benin",
+    "bosnia-herzegovina": "Bosna-Hersek",
+    "brazil": "Brezilya",
+    "bulgaria": "Bulgaristan",
+    "burkina faso": "Burkina Faso",
+    "cameroon": "Kamerun",
+    "canada": "Kanada",
+    "cape verde": "Yeşil Burun Adaları",
+    "chile": "Şili",
+    "colombia": "Kolombiya",
+    "congo": "Kongo",
+    "cote d'ivoire": "Fildişi Sahili",
+    "ivory coast": "Fildişi Sahili",
+    "croatia": "Hırvatistan",
+    "czech republic": "Çekya",
+    "czechia": "Çekya",
+    "dr congo": "Kongo DC",
+    "denmark": "Danimarka",
+    "ecuador": "Ekvador",
+    "egypt": "Mısır",
+    "england": "İngiltere",
+    "finland": "Finlandiya",
+    "france": "Fransa",
+    "gabon": "Gabon",
+    "gambia": "Gambiya",
+    "georgia": "Gürcistan",
+    "germany": "Almanya",
+    "ghana": "Gana",
+    "greece": "Yunanistan",
+    "guinea": "Gine",
+    "guinea-bissau": "Gine-Bissau",
+    "hungary": "Macaristan",
+    "iceland": "İzlanda",
+    "iran": "İran",
+    "iraq": "Irak",
+    "ireland": "İrlanda",
+    "israel": "İsrail",
+    "italy": "İtalya",
+    "jamaica": "Jamaika",
+    "japan": "Japonya",
+    "kazakhstan": "Kazakistan",
+    "korea, south": "Güney Kore",
+    "south korea": "Güney Kore",
+    "kosovo": "Kosova",
+    "madagascar": "Madagaskar",
+    "mali": "Mali",
+    "martinique": "Martinik",
+    "mexico": "Meksika",
+    "montenegro": "Karadağ",
+    "morocco": "Fas",
+    "netherlands": "Hollanda",
+    "nigeria": "Nijerya",
+    "north macedonia": "Kuzey Makedonya",
+    "norway": "Norveç",
+    "paraguay": "Paraguay",
+    "peru": "Peru",
+    "poland": "Polonya",
+    "portugal": "Portekiz",
+    "romania": "Romanya",
+    "russia": "Rusya",
+    "scotland": "İskoçya",
+    "senegal": "Senegal",
+    "serbia": "Sırbistan",
+    "slovakia": "Slovakya",
+    "slovenia": "Slovenya",
+    "spain": "İspanya",
+    "suriname": "Surinam",
+    "sweden": "İsveç",
+    "switzerland": "İsviçre",
+    "the gambia": "Gambiya",
+    "togo": "Togo",
+    "tunisia": "Tunus",
+    "turkey": "Türkiye",
+    "türkiye": "Türkiye",
+    "turkiye": "Türkiye",
+    "ukraine": "Ukrayna",
+    "united arab emirates": "Birleşik Arap Emirlikleri",
+    "united states": "ABD",
+    "usa": "ABD",
+    "uruguay": "Uruguay",
+    "uzbekistan": "Özbekistan",
+    "venezuela": "Venezuela",
+    "wales": "Galler",
+}
+
+INJURY_TR_MAP: dict[str, str] = {
+    "abdominal problems": "Karın bölgesi problemi",
+    "achilles tendon problems": "Aşil tendonu problemi",
+    "adductor injury": "İç uyluk (addüktör) sakatlığı",
+    "adductor pain": "İç uyluk (addüktör) ağrısı",
+    "ankle injury": "Ayak bileği sakatlığı",
+    "ankle ligament tear": "Ayak bileği bağ yırtığı",
+    "ankle problems": "Ayak bileği problemi",
+    "ankle sprain": "Ayak bileği burkulması",
+    "ankle surgery": "Ayak bileği ameliyatı",
+    "appendectomy": "Apandisit ameliyatı",
+    "appendicitis": "Apandisit",
+    "arthroscopy": "Artroskopi (eklem ameliyatı)",
+    "back injury": "Bel / sırt sakatlığı",
+    "back problems": "Bel / sırt problemi",
+    "bone bruise": "Kemik ezilmesi",
+    "bone edema": "Kemik ödemi",
+    "bone splintering": "Kemik kırığı (parçalı)",
+    "broken cheekbone": "Elmacık kemiği kırığı",
+    "broken collarbone": "Köprücük kemiği kırığı",
+    "broken fibula": "Fibula kemiği kırığı",
+    "broken finger": "Parmak kırığı",
+    "broken hand": "El kırığı",
+    "broken jaw": "Çene kırığı",
+    "broken nose bone": "Burun kemiği kırığı",
+    "broken shoulder": "Omuz kırığı",
+    "broken tibia": "Kaval kemiği kırığı",
+    "broken toe": "Ayak parmağı kırığı",
+    "bruise": "Ezilme / darbe",
+    "bruise on ankle": "Ayak bileğinde ezilme",
+    "bruised ribs": "Kaburga ezilmesi",
+    "calf injury": "Baldır sakatlığı",
+    "calf muscle tear": "Baldır kası yırtığı",
+    "calf problems": "Baldır problemi",
+    "calf stiffness": "Baldır kası sertliği",
+    "calf strain": "Baldır gerilmesi",
+    "capsular injury": "Eklem kapsülü sakatlığı",
+    "capsular tear of ankle joint": "Ayak bileği eklem kapsülü yırtığı",
+    "cartilage damage": "Kıkırdak hasarı",
+    "cheekbone bruise": "Elmacık kemiği ezilmesi",
+    "circulation problems": "Dolaşım problemi",
+    "cold": "Soğuk algınlığı",
+    "collateral ankle ligament tear": "Ayak bileği yan bağ yırtığı",
+    "collateral ligament injury": "Yan bağ sakatlığı",
+    "collateral ligament tear": "Yan bağ yırtığı",
+    "combustion": "Yanık",
+    "concussion": "Beyin sarsıntısı",
+    "contracture": "Kas kasılması (kontraktür)",
+    "corona virus": "Koronavirüs (COVID-19)",
+    "cruciate ligament injury": "Çapraz bağ sakatlığı",
+    "cruciate ligament strain": "Çapraz bağ gerilmesi",
+    "cruciate ligament tear": "Çapraz bağ yırtığı",
+    "dead leg": "Uylukta kas darbesi",
+    "edema in the knee": "Dizde ödem",
+    "elbow injury": "Dirsek sakatlığı",
+    "eyebow fracture": "Kaş / göz çevresi kırığı",
+    "facial injury": "Yüz sakatlığı",
+    "femoral fracture": "Uyluk kemiği kırığı",
+    "fever": "Yüksek ateş",
+    "fitness": "Kondisyon eksikliği",
+    "flu": "Grip",
+    "food poisoning": "Gıda zehirlenmesi",
+    "foot bruise": "Ayak ezilmesi",
+    "foot injury": "Ayak sakatlığı",
+    "forearm fracture": "Ön kol kırığı",
+    "groin injury": "Kasık sakatlığı",
+    "groin problems": "Kasık problemi",
+    "groin strain": "Kasık gerilmesi",
+    "groin surgery": "Kasık ameliyatı",
+    "hamstring injury": "Arka adale (hamstring) sakatlığı",
+    "hamstring muscle injury": "Arka adale (hamstring) kas sakatlığı",
+    "hamstring strain": "Arka adale (hamstring) gerilmesi",
+    "hand injury": "El sakatlığı",
+    "head injury": "Baş sakatlığı",
+    "heel injury": "Topuk sakatlığı",
+    "herniated disc": "Bel fıtığı",
+    "hip bruise": "Kalça ezilmesi",
+    "hip injury": "Kalça sakatlığı",
+    "hip problems": "Kalça problemi",
+    "ill": "Hastalık",
+    "infection": "Enfeksiyon",
+    "inflammation": "İltihaplanma",
+    "inflammation in the knee": "Dizde iltihaplanma",
+    "inflammation in the spine": "Omurgada iltihaplanma",
+    "inflammation of pubic bone": "Kasık kemiği iltihabı",
+    "influenza": "Grip (İnfluenza)",
+    "inguinal hernia": "Kasık fıtığı",
+    "injury to abdominal muscles": "Karın kası sakatlığı",
+    "injury to the ankle": "Ayak bileği sakatlığı",
+    "inner knee ligament tear": "Diz iç yan bağ yırtığı",
+    "inner ligament injury": "İç yan bağ sakatlığı",
+    "inner ligament stretch of the knee": "Diz iç yan bağ esnemesi",
+    "inner ligament tear in ankle joint": "Ayak bileği iç bağ yırtığı",
+    "internal ligament strain": "İç bağ gerilmesi",
+    "intestinal virus": "Bağırsak virüsü",
+    "knee bruise": "Diz ezilmesi",
+    "knee injury": "Diz sakatlığı",
+    "knee problems": "Diz problemi",
+    "knee surgery": "Diz ameliyatı",
+    "knock": "Darbe",
+    "left hip flexor problems": "Sol kalça fleksörü problemi",
+    "leg injury": "Bacak sakatlığı",
+    "ligament injury": "Bağ sakatlığı",
+    "ligament stretching": "Bağ esnemesi",
+    "lower leg fracture": "Alt bacak kırığı",
+    "lumbago": "Bel ağrısı (lumbago)",
+    "lumbar vertebra fracture": "Bel omuru kırığı",
+    "meniscus damage": "Menisküs hasarı",
+    "meniscus injury": "Menisküs sakatlığı",
+    "meniscus tear": "Menisküs yırtığı",
+    "metacarpal fracture": "El tarak kemiği kırığı",
+    "metatarsal fracture": "Ayak tarak kemiği kırığı",
+    "minor knock": "Hafif darbe",
+    "muscle fatigue": "Kas yorgunluğu",
+    "muscle fiber tear": "Kas lifi yırtığı",
+    "muscle injury": "Kas sakatlığı",
+    "muscle strain": "Kas gerilmesi",
+    "muscle tear": "Kas yırtığı",
+    "muscular problems": "Kas problemi",
+    "neck injury": "Boyun sakatlığı",
+    "nose surgery": "Burun ameliyatı",
+    "outer ligament problems": "Dış yan bağ problemi",
+    "outer ligament tear": "Dış yan bağ yırtığı",
+    "partial muscle tear": "Kısmi kas yırtığı",
+    "pneumonia": "Zatürre",
+    "pneumothorax": "Akciğer sönmesi (pnömotoraks)",
+    "pubalgia": "Pubalji (kasık ağrısı)",
+    "pubic bone irritation": "Kasık kemiği tahrişi",
+    "quarantine": "Karantina",
+    "rest": "Dinlenme",
+    "rib fracture": "Kaburga kırığı",
+    "scaphoid fracture": "El bileği (skafoid) kemiği kırığı",
+    "shin bruise": "Kaval bölgesi ezilmesi",
+    "shin injury": "Kaval bölgesi sakatlığı",
+    "shoulder injury": "Omuz sakatlığı",
+    "sprain": "Burkulma",
+    "stomach flu": "Mide gribi",
+    "stomach problems": "Mide problemi",
+    "strain": "Kas gerilmesi",
+    "strain in the thigh and gluteal muscles": "Uyluk ve kalça kası gerilmesi",
+    "stress reaction of the bone": "Kemik stres reaksiyonu",
+    "surgery": "Ameliyat",
+    "syndesmosis ligament tear": "Sindezmoz bağ yırtığı",
+    "syndesmotic ligament tear": "Sindezmoz bağ yırtığı",
+    "tear of the lateral meniscus": "Dış menisküs yırtığı",
+    "tendon tear": "Tendon yırtığı",
+    "tendonitis": "Tendinit (tendon iltihabı)",
+    "thigh problems": "Uyluk (üst adale) problemi",
+    "toe injury": "Ayak parmağı sakatlığı",
+    "tonsillitis": "Bademcik iltihabı",
+    "torn ankle ligaments": "Ayak bileği bağ yırtığı",
+    "torn lateral ankle ligament": "Dış ayak bileği bağ yırtığı",
+    "torn ligaments": "Bağ yırtığı",
+    "torn muscle bundle": "Kas demeti yırtığı",
+    "torn muscle fiber": "Kas lifi yırtığı",
+    "torn muscle fiber in the adductor area": "İç uyluk (addüktör) kas lifi yırtığı",
+    "torn thigh muscle": "Üst bacak (uyluk) kas yırtığı",
+    "unknown": "Belirtilmemiş sakatlık",
+    "virus": "Viral enfeksiyon",
+}
+
+
+def _translate_position(pos_raw: str) -> tuple[str, str]:
+    clean = pos_raw.strip()
+    hit = POSITION_TR_MAP.get(clean.lower())
+    if hit:
+        return hit
+    p = clean.lower()
     if "goal" in p:
         return "Kaleci", "GK"
     if "def" in p or "back" in p:
         return "Defans", "DF"
-    if "forw" in p or "strik" in p or "att" in p:
+    if "wing" in p or "forw" in p or "strik" in p or "att" in p:
         return "Forvet", "FW"
     return "Orta Saha", "MF"
+
+
+def _map_pos(pos_raw: str) -> tuple[str, str]:
+    return _translate_position(pos_raw)
+
+
+def _translate_citizenship_tr(raw: Any) -> str:
+    s = str(raw or "").strip()
+    if not s or s == "—":
+        return "—"
+    out: list[str] = []
+    for part in s.split(","):
+        item = part.strip()
+        if not item:
+            continue
+        out.append(COUNTRY_TR_MAP.get(item.lower(), item))
+    return ", ".join(dict.fromkeys(out)) if out else "—"
+
+
+def _translate_injury_reason_tr(reason: str) -> str:
+    clean = reason.strip()
+    if not clean:
+        return "Belirtilmemiş sakatlık"
+    exact = INJURY_TR_MAP.get(clean.lower())
+    if exact:
+        return exact
+    low = clean.lower()
+    body_map = (
+        ("hamstring", "Arka adale"),
+        ("ankle", "Ayak bileği"),
+        ("knee", "Diz"),
+        ("shoulder", "Omuz"),
+        ("groin", "Kasık"),
+        ("calf", "Baldır"),
+        ("thigh", "Uyluk"),
+        ("hip", "Kalça"),
+        ("back", "Bel / sırt"),
+        ("foot", "Ayak"),
+        ("hand", "El"),
+        ("wrist", "El bileği"),
+        ("elbow", "Dirsek"),
+        ("neck", "Boyun"),
+        ("head", "Baş"),
+        ("nose", "Burun"),
+        ("rib", "Kaburga"),
+        ("achilles", "Aşil tendonu"),
+        ("cruciate", "Çapraz bağ"),
+        ("meniscus", "Menisküs"),
+        ("adductor", "Addüktör"),
+        ("muscle", "Kas"),
+        ("ligament", "Bağ"),
+    )
+    part_tr = next((tr for en, tr in body_map if en in low), "")
+    if part_tr:
+        if "surgery" in low or "operation" in low:
+            return f"{part_tr} ameliyatı"
+        if "fracture" in low or "broken" in low:
+            return f"{part_tr} kırığı"
+        if "tear" in low or "torn" in low or "rupture" in low:
+            return f"{part_tr} yırtığı"
+        if "strain" in low:
+            return f"{part_tr} gerilmesi"
+        if "sprain" in low:
+            return f"{part_tr} burkulması"
+        if "bruise" in low:
+            return f"{part_tr} ezilmesi"
+        if "problem" in low or "pain" in low:
+            return f"{part_tr} problemi"
+        if "injury" in low:
+            return f"{part_tr} sakatlığı"
+    return clean
 
 
 def _shorten_name(full_name: str) -> str:
@@ -467,8 +821,8 @@ def _apply_real_player_profile(
             p["fullName"] = best_full
             p["name"] = _shorten_name(best_full) if " " in best_full else best_full
 
-    citizenship = str(prof.get("citizenship") or "").strip()
-    if citizenship:
+    citizenship = _translate_citizenship_tr(prof.get("citizenship"))
+    if citizenship != "—":
         p["citizenship"] = citizenship
 
     foot = _map_foot(prof.get("foot"))
@@ -492,11 +846,24 @@ def _apply_real_player_profile(
         p["contractExpiry"] = expiry_iso
 
     pos_block = prof.get("position") if isinstance(prof.get("position"), dict) else {}
+    main_pos_raw = str(pos_block.get("main") or "").strip()
+    if main_pos_raw:
+        tr_main, tr_group = _translate_position(main_pos_raw)
+        p["positionMain"] = tr_main
+        p["positionGroup"] = tr_group
     sec_pos = pos_block.get("secondary")
+    sec_items: list[str] = []
     if isinstance(sec_pos, list):
-        p["positionSecondary"] = [str(x).strip() for x in sec_pos if x]
+        for x in sec_pos:
+            sec_items.extend(part.strip() for part in str(x or "").split(",") if part.strip())
     elif isinstance(sec_pos, str) and sec_pos.strip():
-        p["positionSecondary"] = [sec_pos.strip()]
+        sec_items.extend(part.strip() for part in sec_pos.split(",") if part.strip())
+    if sec_items:
+        p["positionSecondary"] = [
+            lbl
+            for lbl in dict.fromkeys(_translate_position(s)[0] for s in sec_items)
+            if lbl and lbl != p["positionMain"]
+        ]
 
     # Market Value History & Peak/Current Value
     mv_raw = raw_prof.get("marketValue") if isinstance(raw_prof.get("marketValue"), list) else []
@@ -586,7 +953,8 @@ def _apply_real_player_profile(
         for inj in inj_raw:
             if not isinstance(inj, dict):
                 continue
-            reason = str(inj.get("reason") or "Unknown").strip()
+            raw_reason = str(inj.get("reason") or "Unknown").strip()
+            reason_tr = _translate_injury_reason_tr(raw_reason)
             from_iso = _parse_dmy_to_iso(inj.get("fromDate"))
             to_iso = _parse_dmy_to_iso(inj.get("toDate"))
             days = int(inj.get("absentDurationInDays") or 0)
@@ -595,10 +963,10 @@ def _apply_real_player_profile(
             total_missed += missed
             total_cnt += 1
 
-            reg_id, sys_cat = _classify_injury_reason(reason)
+            reg_id, sys_cat = _classify_injury_reason(raw_reason)
             if reg_id is None:
                 systemic.append({
-                    "reason": reason,
+                    "reason": reason_tr,
                     "category": sys_cat,
                     "fromDate": from_iso,
                     "toDate": to_iso,
@@ -613,7 +981,7 @@ def _apply_real_player_profile(
                 slot["totalDays"] += days
                 slot["missedGames"] += missed
                 slot["records"].append({
-                    "reason": reason,
+                    "reason": reason_tr,
                     "fromDate": from_iso,
                     "toDate": to_iso,
                     "days": days,

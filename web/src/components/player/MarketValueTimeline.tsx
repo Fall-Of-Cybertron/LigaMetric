@@ -40,6 +40,19 @@ export function MarketValueTimeline({ history, peakValueEur }: MarketValueTimeli
     return { x, y, pt };
   });
 
+  const firstPeakIdx = coords.findIndex((c) => c.pt.value === peakValueEur);
+  const visibleYearIndices = new Set<number>();
+  let lastShownYear = '';
+  let lastShownX = -Infinity;
+  coords.forEach((c, idx) => {
+    const yr = c.pt.recordedDate.slice(0, 4);
+    if (yr !== lastShownYear && c.x - lastShownX >= 36) {
+      visibleYearIndices.add(idx);
+      lastShownYear = yr;
+      lastShownX = c.x;
+    }
+  });
+
   const linePath = coords.map((c, idx) => `${idx === 0 ? 'M' : 'L'} ${c.x} ${c.y}`).join(' ');
   const areaPath = `${linePath} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${
     padT + plotH
@@ -135,7 +148,10 @@ export function MarketValueTimeline({ history, peakValueEur }: MarketValueTimeli
           {/* Points */}
           {coords.map((c, idx) => {
             const isPeak = c.pt.value === peakValueEur;
+            const isFirstPeak = idx === firstPeakIdx;
+            const showYear = visibleYearIndices.has(idx);
             const isActive = idx === activeIdx;
+            const peakLabelX = Math.min(width - padR - 36, Math.max(padL + 36, c.x));
             return (
               <g
                 key={`mv-pt-${idx}`}
@@ -143,20 +159,22 @@ export function MarketValueTimeline({ history, peakValueEur }: MarketValueTimeli
                 onClick={() => setActiveIdx(idx)}
                 className="cursor-pointer"
               >
-                <text
-                  x={c.x}
-                  y={height - 10}
-                  textAnchor="middle"
-                  fill={isActive ? '#06B6D4' : '#64748B'}
-                  fontSize="10"
-                  className="tabular-nums"
-                >
-                  {c.pt.recordedDate.slice(0, 4)}
-                </text>
-                {isPeak && (
+                {showYear && (
                   <text
                     x={c.x}
-                    y={c.y - 10}
+                    y={height - 10}
+                    textAnchor="middle"
+                    fill={isActive ? '#06B6D4' : '#64748B'}
+                    fontSize="10"
+                    className="tabular-nums"
+                  >
+                    {c.pt.recordedDate.slice(0, 4)}
+                  </text>
+                )}
+                {isFirstPeak && (
+                  <text
+                    x={peakLabelX}
+                    y={Math.max(12, c.y - 10)}
                     textAnchor="middle"
                     fill="#FBBF24"
                     fontSize="9.5"
@@ -169,7 +187,7 @@ export function MarketValueTimeline({ history, peakValueEur }: MarketValueTimeli
                 <circle
                   cx={c.x}
                   cy={c.y}
-                  r={isActive ? 6.5 : isPeak ? 5.5 : 4.5}
+                  r={isActive ? 6.5 : isPeak ? 5.5 : 4}
                   fill={isPeak ? '#FBBF24' : '#090D16'}
                   stroke={isActive ? '#06B6D4' : '#10B981'}
                   strokeWidth={isActive ? 2.5 : 2}
