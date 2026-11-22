@@ -409,13 +409,17 @@ export function PlayerProfileTabs({ player, clubName }: PlayerProfileTabsProps) 
                   {player.perClub.map((c, idx) => (
                     <tr key={`pc-${idx}`} className="hover:bg-[#1E293B]/60">
                       <td className="px-4 py-2.5">
-                        <Link
-                          href={`/clubs/${c.clubId}`}
-                          className="inline-flex items-center gap-2 font-semibold text-slate-100 hover:text-cyan-300"
-                        >
-                          <ClubBadge clubId={c.clubId} size="xs" />
-                          <span>{c.clubName}</span>
-                        </Link>
+                        {c.clubId ? (
+                          <Link
+                            href={`/clubs/${c.clubId}`}
+                            className="inline-flex items-center gap-2 font-semibold text-slate-100 hover:text-cyan-300"
+                          >
+                            <ClubBadge clubId={c.clubId} size="xs" />
+                            <span>{c.clubName}</span>
+                          </Link>
+                        ) : (
+                          <span className="font-semibold text-slate-200">{c.clubName}</span>
+                        )}
                       </td>
                       <td className="px-3 py-2.5 text-slate-300">{c.competition}</td>
                       <td className="px-3 py-2.5 tabular-nums text-slate-400">{c.seasonRange}</td>
@@ -430,13 +434,17 @@ export function PlayerProfileTabs({ player, clubName }: PlayerProfileTabsProps) 
                         {c.assists}
                       </td>
                       <td className="px-4 py-2.5 text-right">
-                        <span
-                          className={`tabular-nums inline-block rounded border px-1.5 py-0.5 text-[11px] font-bold ${getRatingBadgeClass(
-                            c.avgRating
-                          )}`}
-                        >
-                          {formatRating(c.avgRating)}
-                        </span>
+                        {c.avgRating > 0 ? (
+                          <span
+                            className={`tabular-nums inline-block rounded border px-1.5 py-0.5 text-[11px] font-bold ${getRatingBadgeClass(
+                              c.avgRating
+                            )}`}
+                          >
+                            {formatRating(c.avgRating)}
+                          </span>
+                        ) : (
+                          <span className="text-slate-500">—</span>
+                        )}
                       </td>
                     </tr>
                   ))}

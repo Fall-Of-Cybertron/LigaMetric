@@ -121,7 +121,7 @@ def harvest_player_profiles_if_spare_quota(
     max_missing: int = 180,
     max_refresh: int = 75,
 ) -> int:
-    """Maç rezervi düşüldükten sonra eksik ve süresi (7 gün) dolmuş oyuncu profillerini çeker."""
+    """Maç rezervi düşüldükten sonra eksik ve süresi (7 gün) dolmuş oyuncu profil ve istatistiklerini çeker."""
     players_path = GOLD_DIR / "players.json"
     if not players_path.exists():
         return 0
@@ -129,11 +129,13 @@ def harvest_player_profiles_if_spare_quota(
     players_gold = json.loads(players_path.read_text(encoding="utf-8"))
     media_cache = load_media_cache()
     players_dir = BRONZE_DIR / "players"
+    stats_dir = BRONZE_DIR / "player_stats"
     now_ts = time.time()
     ttl_seconds = ttl_days * 86400
 
-    missing_candidates: list[tuple[int, int, str, int]] = []
-    stale_candidates: list[tuple[float, int, str, int]] = []
+    missing_profiles: list[tuple[int, int, str, int]] = []
+    missing_stats: list[tuple[int, int, str, int]] = []
+    stale_targets: list[tuple[float, int, str, str, int]] = []
 
     for p in players_gold:
         pid = str(p.get("id") or "")
@@ -144,48 +146,69 @@ def harvest_player_profiles_if_spare_quota(
             continue
         games = int(p.get("gamesPlayed") or 0)
         mv = int(p.get("currentMarketValueEur") or 0)
+        hl_pid = int(raw_id)
+
         pfile = players_dir / f"player_{raw_id}.json"
         if not pfile.exists():
-            missing_candidates.append((games, mv, pid, int(raw_id)))
-        else:
-            age_sec = now_ts - pfile.stat().st_mtime
-            if age_sec > ttl_seconds:
-                stale_candidates.append((pfile.stat().st_mtime, -games, pid, int(raw_id)))
+            missing_profiles.append((games, mv, pid, hl_pid))
+        elif (now_ts - pfile.stat().st_mtime) > ttl_seconds:
+            stale_targets.append((pfile.stat().st_mtime, -games, "profile", pid, hl_pid))
 
-    missing_candidates.sort(reverse=True)
-    stale_candidates.sort()
+        sfile = stats_dir / f"stats_{raw_id}.json"
+        if not sfile.exists():
+            missing_stats.append((games, mv, pid, hl_pid))
+        elif (now_ts - sfile.stat().st_mtime) > ttl_seconds:
+            stale_targets.append((sfile.stat().st_mtime, -games, "stats", pid, hl_pid))
+
+    missing_profiles.sort(reverse=True)
+    missing_stats.sort(reverse=True)
+    stale_targets.sort()
 
     fetched = 0
     photos_updated = False
 
-    def _fetch_profile(pid: str, hl_pid: int, force_refresh: bool) -> bool:
+    def _fetch_endpoint(kind: str, pid: str, hl_pid: int, force_refresh: bool) -> bool:
         nonlocal fetched, photos_updated
         if client.budget_stopped or client.total_remaining_safe_quota() <= reserve_quota:
             return False
-        res = client.get(
-            f"/players/{hl_pid}",
-            cache_group="players",
-            cache_name=f"player_{hl_pid}",
-            force_refresh=force_refresh,
-        )
-        fetched += 1
-        items = unwrap_data(res)
-        if items and isinstance(items[0], dict):
-            photo = items[0].get("logo") or items[0].get("photo") or items[0].get("image")
-            if isinstance(photo, str) and photo.startswith("http"):
-                media_cache.setdefault("player_photos", {})[pid] = photo
-                photos_updated = True
+        if kind == "profile":
+            res = client.get(
+                f"/players/{hl_pid}",
+                cache_group="players",
+                cache_name=f"player_{hl_pid}",
+                force_refresh=force_refresh,
+            )
+            fetched += 1
+            items = unwrap_data(res)
+            if items and isinstance(items[0], dict):
+                photo = items[0].get("logo") or items[0].get("photo") or items[0].get("image")
+                if isinstance(photo, str) and photo.startswith("http"):
+                    media_cache.setdefault("player_photos", {})[pid] = photo
+                    photos_updated = True
+        else:
+            client.get(
+                f"/players/{hl_pid}/statistics",
+                cache_group="player_stats",
+                cache_name=f"stats_{hl_pid}",
+                force_refresh=force_refresh,
+            )
+            fetched += 1
         return True
 
-    # 1) Öncelik: Profili hiç olmayan oyuncular
-    for _, _, pid, hl_pid in missing_candidates[:max_missing]:
-        if not _fetch_profile(pid, hl_pid, force_refresh=False):
+    # 1) Öncelik: Eksik /players/{id} profilleri, ardından eksik /players/{id}/statistics kayıtları
+    missing_queue: list[tuple[str, str, int]] = [
+        ("profile", pid, hl_pid) for _, _, pid, hl_pid in missing_profiles
+    ] + [
+        ("stats", pid, hl_pid) for _, _, pid, hl_pid in missing_stats
+    ]
+    for kind, pid, hl_pid in missing_queue[:max_missing]:
+        if not _fetch_endpoint(kind, pid, hl_pid, force_refresh=False):
             break
 
-    # 2) Öncelik: TTL (7 gün) süresi dolmuş profiller
+    # 2) Öncelik: TTL (7 gün) süresi dolmuş profil ve istatistikler
     if not client.budget_stopped and client.total_remaining_safe_quota() > reserve_quota:
-        for _, _, pid, hl_pid in stale_candidates[:max_refresh]:
-            if not _fetch_profile(pid, hl_pid, force_refresh=True):
+        for _, _, kind, pid, hl_pid in stale_targets[:max_refresh]:
+            if not _fetch_endpoint(kind, pid, hl_pid, force_refresh=True):
                 break
 
     if photos_updated:

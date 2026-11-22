@@ -1007,6 +1007,51 @@ def _apply_real_player_profile(
             p["injuryRisk"] = "Düşük"
 
 
+def _apply_real_player_statistics(
+    p: dict[str, Any],
+    raw_stats: dict[str, Any],
+    clubs_by_norm: dict[str, str],
+) -> None:
+    """Highlightly /players/{id}/statistics geçmiş turnuva/kulüp verilerini işler."""
+    per_comp = raw_stats.get("perCompetition") if isinstance(raw_stats.get("perCompetition"), list) else []
+    if not per_comp:
+        return
+
+    rows: list[dict[str, Any]] = []
+    for item in per_comp:
+        if not isinstance(item, dict):
+            continue
+        club_name = str(item.get("club") or "—").strip()
+        league = str(item.get("league") or "—").strip()
+        season = str(item.get("season") or "—").strip()
+        games = int(item.get("gamesPlayed") or 0)
+        minutes = int(item.get("minutesPlayed") or 0)
+        if games <= 0 and minutes <= 0:
+            continue
+        goals = int(item.get("goals") or 0)
+        assists = int(item.get("assists") or 0)
+        cid = resolve_club_id(club_name, clubs_by_norm) or ""
+        is_current_super_lig = (
+            season == "26/27"
+            and cid == p["clubId"]
+            and ("süper lig" in league.lower() or "super lig" in league.lower())
+        )
+        rows.append({
+            "clubId": cid,
+            "clubName": club_name,
+            "competition": league,
+            "seasonRange": season,
+            "games": games,
+            "minutes": minutes,
+            "goals": goals,
+            "assists": assists,
+            "avgRating": p["avgMatchRating"] if is_current_super_lig else 0,
+        })
+
+    if rows:
+        p["perClub"] = rows
+
+
 def _create_player_record(
     player_id: str,
     full_name: str,
@@ -1139,6 +1184,21 @@ def merge_bronze_into_gold() -> dict[str, int]:
                     p_url = p_items[0].get("logo") or p_items[0].get("photo") or p_items[0].get("image")
                     if isinstance(p_url, str) and p_url.startswith("http"):
                         photo_map.setdefault(canon_pid, p_url)
+            except (OSError, json.JSONDecodeError):
+                continue
+
+    player_stats_by_id: dict[str, dict[str, Any]] = {}
+    stats_bronze_dir = BRONZE_DIR / "player_stats"
+    if stats_bronze_dir.exists():
+        for sf in sorted(stats_bronze_dir.glob("stats_*.json")):
+            m_sid = re.search(r"stats_(\d+)\.json", sf.name)
+            if not m_sid:
+                continue
+            try:
+                s_raw = json.loads(sf.read_text(encoding="utf-8"))
+                s_items = unwrap_data(s_raw)
+                if s_items and isinstance(s_items[0], dict):
+                    player_stats_by_id[f"hl-{m_sid.group(1)}"] = s_items[0]
             except (OSError, json.JSONDecodeError):
                 continue
 
@@ -2213,6 +2273,8 @@ def merge_bronze_into_gold() -> dict[str, int]:
         ]
         if p["id"] in player_profiles_by_id:
             _apply_real_player_profile(p, player_profiles_by_id[p["id"]], clubs_by_norm)
+        if p["id"] in player_stats_by_id:
+            _apply_real_player_statistics(p, player_stats_by_id[p["id"]], clubs_by_norm)
         final_players.append(p)
 
     # Keep seed players ONLY for Super Lig clubs that don't have a real lineup downloaded yet
@@ -2374,7 +2436,9 @@ def merge_bronze_into_gold() -> dict[str, int]:
         for pt in p.get("marketValueHistory", []):
             if pt.get("clubId") not in valid_club_ids:
                 pt["clubId"] = ""
-        p["perClub"] = [pc for pc in p.get("perClub", []) if pc["clubId"] in valid_club_ids]
+        for pc in p.get("perClub", []):
+            if pc.get("clubId") not in valid_club_ids:
+                pc["clubId"] = ""
 
     standings_path.write_text(json.dumps(standings_doc, indent=2, ensure_ascii=False), encoding="utf-8")
     clubs_path.write_text(json.dumps(clubs_list, indent=2, ensure_ascii=False), encoding="utf-8")
