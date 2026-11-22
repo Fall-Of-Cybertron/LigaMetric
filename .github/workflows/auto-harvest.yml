@@ -2,7 +2,9 @@ name: LigaMetric Otomatik Veri Guncelleme
 
 on:
   schedule:
-    # Her gün 04:00 UTC (07:00 TSİ) saatinde günde 1 kez çalışır (API kotası 24 saatte bir yenilenir)
+    # Maç saatlerinde (15:00-01:30 TSİ) her 30 dakikada bir sıfır-kotalı maç bitiş kontrolü yapar
+    - cron: '*/30 12-22 * * *'
+    # Günlük sabah kontrolü (07:00 TSİ): fikstür değişiklikleri, gecikmeli özetler ve oyuncu portreleri
     - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
@@ -26,7 +28,17 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Maç Sonrası Pencere Kontrolü (0 API Kotası)
+        id: match_gate
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event.schedule }}" = "0 4 * * *" ]; then
+            python backend/check_match_window.py --force
+          else
+            python backend/check_match_window.py
+          fi
+
       - name: Node.js Kur
+        if: steps.match_gate.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -34,6 +46,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Turso'dan Önbelleği Çek, Yeni Verileri Topla ve Gold JSON Üret
+        if: steps.match_gate.outputs.should_run == 'true'
         env:
           HIGHLIGHTLY_BASE_URL: https://sports.highlightly.net/football
           HIGHLIGHTLY_AUTH_MODE: x-rapidapi-key
@@ -51,12 +64,14 @@ jobs:
           python backend/sync_highlightly.py merge
 
       - name: Statik Site Derleme Testi (output export)
+        if: steps.match_gate.outputs.should_run == 'true'
         working-directory: web
         run: |
           npm ci
           npm run build
 
       - name: Güncel Gold Özet Verilerini Kaydet (Ham API Verisi Hariç)
+        if: steps.match_gate.outputs.should_run == 'true'
         run: |
           git config user.name "ligametric-bot"
           git config user.email "bot@ligametric.local"

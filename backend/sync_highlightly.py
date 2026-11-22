@@ -1758,6 +1758,34 @@ def merge_bronze_into_gold() -> dict[str, int]:
         else 0
     )
 
+    # Yaklaşan / henüz tamamlanmamış maçların başlama saatlerini çıkar (maç sonrası tetikleyici için)
+    upcoming_by_id: dict[int, dict[str, Any]] = {}
+    matches_bronze_dir = BRONZE_DIR / "matches"
+    if matches_bronze_dir.exists():
+        for fpath in sorted(matches_bronze_dir.glob("*.json")):
+            try:
+                raw_m = json.loads(fpath.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            for m in unwrap_data(raw_m):
+                if not isinstance(m, dict) or m.get("id") is None or not m.get("date"):
+                    continue
+                if (m.get("state") or {}).get("description") == "Finished":
+                    continue
+                upcoming_by_id[int(m["id"])] = m
+
+    upcoming_sorted = sorted(upcoming_by_id.values(), key=lambda m: str(m.get("date") or ""))
+    upcoming_kickoffs = [
+        {
+            "id": int(m["id"]),
+            "dateUtc": str(m.get("date") or ""),
+            "home": str((m.get("homeTeam") or {}).get("name") or ""),
+            "away": str((m.get("awayTeam") or {}).get("name") or ""),
+            "state": str((m.get("state") or {}).get("description") or ""),
+        }
+        for m in upcoming_sorted[:25]
+    ]
+
     sync_status_doc = {
         "lastSyncedAt": now_tsi.strftime("%d.%m.%Y %H:%M TSİ"),
         "lastSyncedIso": now_tsi.isoformat(),
@@ -1771,6 +1799,7 @@ def merge_bronze_into_gold() -> dict[str, int]:
         "clubsWithRealSquads": len(clubs_with_real_lineups),
         "totalPlayersCount": len(final_players),
         "bronzeFilesCount": bronze_files_cnt,
+        "upcomingKickoffs": upcoming_kickoffs,
         "rounds": round_summaries,
         "clubCoverage": club_coverage,
     }

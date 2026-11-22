@@ -1,6 +1,6 @@
 {
-  "lastSyncedAt": "22.11.2026 14:34 TSİ",
-  "lastSyncedIso": "2026-11-22T14:34:21.885235+03:00",
+  "lastSyncedAt": "22.11.2026 15:34 TSİ",
+  "lastSyncedIso": "2026-11-22T15:34:37.867669+03:00",
   "season": "2026/27",
   "currentRound": 12,
   "totalFinishedMatches": 103,
@@ -11,6 +11,183 @@
   "clubsWithRealSquads": 18,
   "totalPlayersCount": 501,
   "bronzeFilesCount": 224,
+  "upcomingKickoffs": [
+    {
+      "id": 1348383052,
+      "dateUtc": "2026-11-22T10:30:00.000Z",
+      "home": "Erzurum BB",
+      "away": "Goztepe",
+      "state": "Half time"
+    },
+    {
+      "id": 1348387307,
+      "dateUtc": "2026-11-22T13:00:00.000Z",
+      "home": "Konyaspor",
+      "away": "Besiktas",
+      "state": "Not started"
+    },
+    {
+      "id": 1348385605,
+      "dateUtc": "2026-11-22T13:00:00.000Z",
+      "home": "Kasımpaşa",
+      "away": "Alanyaspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348388158,
+      "dateUtc": "2026-11-22T16:00:00.000Z",
+      "home": "Trabzonspor",
+      "away": "Eyüpspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348382201,
+      "dateUtc": "2026-11-23T17:00:00.000Z",
+      "home": "İstanbul Başakşehir",
+      "away": "Yeni Çorumspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348394966,
+      "dateUtc": "2026-11-27T17:00:00.000Z",
+      "home": "Rizespor",
+      "away": "Kasımpaşa",
+      "state": "Not started"
+    },
+    {
+      "id": 1348389009,
+      "dateUtc": "2026-11-27T17:00:00.000Z",
+      "home": "Alanyaspor",
+      "away": "Konyaspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348395817,
+      "dateUtc": "2026-11-28T13:00:00.000Z",
+      "home": "Samsunspor",
+      "away": "Genclerbirligi",
+      "state": "Not started"
+    },
+    {
+      "id": 1348393264,
+      "dateUtc": "2026-11-28T16:00:00.000Z",
+      "home": "Gazişehir Gaziantep",
+      "away": "Amed",
+      "state": "Not started"
+    },
+    {
+      "id": 1348390711,
+      "dateUtc": "2026-11-29T10:30:00.000Z",
+      "home": "Yeni Çorumspor",
+      "away": "Kocaelispor FK",
+      "state": "Not started"
+    },
+    {
+      "id": 1348391562,
+      "dateUtc": "2026-11-29T13:00:00.000Z",
+      "home": "Eyüpspor",
+      "away": "İstanbul Başakşehir",
+      "state": "Not started"
+    },
+    {
+      "id": 1348392413,
+      "dateUtc": "2026-11-29T16:00:00.000Z",
+      "home": "Fenerbahce",
+      "away": "Erzurum BB",
+      "state": "Not started"
+    },
+    {
+      "id": 1348394115,
+      "dateUtc": "2026-11-30T16:00:00.000Z",
+      "home": "Goztepe",
+      "away": "Trabzonspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348389860,
+      "dateUtc": "2026-11-30T18:00:00.000Z",
+      "home": "Besiktas",
+      "away": "Galatasaray",
+      "state": "Not started"
+    },
+    {
+      "id": 1348400072,
+      "dateUtc": "2026-12-04T17:00:00.000Z",
+      "home": "Galatasaray",
+      "away": "Rizespor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348402625,
+      "dateUtc": "2026-12-05T10:30:00.000Z",
+      "home": "Konyaspor",
+      "away": "Gazişehir Gaziantep",
+      "state": "Not started"
+    },
+    {
+      "id": 1348396668,
+      "dateUtc": "2026-12-05T13:00:00.000Z",
+      "home": "Amed",
+      "away": "Alanyaspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348397519,
+      "dateUtc": "2026-12-05T16:00:00.000Z",
+      "home": "İstanbul Başakşehir",
+      "away": "Fenerbahce",
+      "state": "Not started"
+    },
+    {
+      "id": 1348399221,
+      "dateUtc": "2026-12-06T10:30:00.000Z",
+      "home": "Erzurum BB",
+      "away": "Kocaelispor FK",
+      "state": "Not started"
+    },
+    {
+      "id": 1348400923,
+      "dateUtc": "2026-12-06T13:00:00.000Z",
+      "home": "Genclerbirligi",
+      "away": "Eyüpspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348398370,
+      "dateUtc": "2026-12-06T13:00:00.000Z",
+      "home": "Besiktas",
+      "away": "Samsunspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348403476,
+      "dateUtc": "2026-12-06T16:00:00.000Z",
+      "home": "Trabzonspor",
+      "away": "Yeni Çorumspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348401774,
+      "dateUtc": "2026-12-07T17:00:00.000Z",
+      "home": "Kasımpaşa",
+      "away": "Goztepe",
+      "state": "Not started"
+    },
+    {
+      "id": 1348405178,
+      "dateUtc": "2026-12-11T17:00:00.000Z",
+      "home": "Yeni Çorumspor",
+      "away": "Amed",
+      "state": "Not started"
+    },
+    {
+      "id": 1348406029,
+      "dateUtc": "2026-12-12T10:30:00.000Z",
+      "home": "Erzurum BB",
+      "away": "Kasımpaşa",
+      "state": "Not started"
+    }
+  ],
   "rounds": [
     {
       "round": 12,
