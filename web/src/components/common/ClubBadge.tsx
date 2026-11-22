@@ -17,7 +17,7 @@ const SIZE_CLASSES = {
 
 export function ClubBadge({ clubId, size = 'sm' }: ClubBadgeProps) {
   const club = getClubById(clubId);
-  const logoUrl = club?.logo;
+  const logoUrl = club?.isSuperLig ? `/logos/${club.id}.png` : club?.logo;
   const [imgError, setImgError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -34,7 +34,9 @@ export function ClubBadge({ clubId, size = 'sm' }: ClubBadgeProps) {
     }
   };
 
-  const hasRemoteLogo = Boolean(logoUrl && logoUrl.startsWith('http') && !imgError);
+  const hasRemoteLogo = Boolean(
+    logoUrl && (logoUrl.startsWith('/') || logoUrl.startsWith('http')) && !imgError
+  );
 
   if (hasRemoteLogo) {
     return (
