@@ -1,0 +1,65 @@
+name: LigaMetric Otomatik Veri Guncelleme
+
+on:
+  schedule:
+    # Her gün 04:00 UTC (07:00 TSİ) saatinde günde 1 kez çalışır (API kotası 24 saatte bir yenilenir)
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      batch_budget:
+        description: 'Bu çalışmada atılacak maksimum API isteği'
+        required: false
+        default: '240'
+
+permissions:
+  contents: write
+
+jobs:
+  harvest-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu İndir
+        uses: actions/checkout@v4
+
+      - name: Python Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Node.js Kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: Turso'dan Önbelleği Çek, Yeni Verileri Topla ve Gold JSON Üret
+        env:
+          HIGHLIGHTLY_BASE_URL: https://sports.highlightly.net/football
+          HIGHLIGHTLY_AUTH_MODE: x-rapidapi-key
+          HIGHLIGHTLY_API_KEY_1: ${{ secrets.HIGHLIGHTLY_API_KEY_1 }}
+          HIGHLIGHTLY_API_KEY_2: ${{ secrets.HIGHLIGHTLY_API_KEY_2 }}
+          HIGHLIGHTLY_API_KEY_3: ${{ secrets.HIGHLIGHTLY_API_KEY_3 }}
+          HIGHLIGHTLY_API_KEYS: ${{ secrets.HIGHLIGHTLY_API_KEYS }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          python backend/turso_client.py pull-bronze
+          BUDGET="${{ github.event.inputs.batch_budget || '240' }}"
+          python backend/auto_harvester.py --batch-budget "$BUDGET" --refresh-feeds
+          python backend/media_enrichment.py --max-matches 25 --max-players 50
+          python backend/sync_highlightly.py merge
+
+      - name: Statik Site Derleme Testi (output export)
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Güncel Gold Özet Verilerini Kaydet (Ham API Verisi Hariç)
+        run: |
+          git config user.name "ligametric-bot"
+          git config user.email "bot@ligametric.local"
+          git add web/src/data/*.json
+          git diff --staged --quiet || git commit -m "chore(data): otomatik LigaMetric veri güncellemesi"
+          git push
