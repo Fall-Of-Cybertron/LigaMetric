@@ -1,7 +1,7 @@
 {
   "season": "2026/27",
   "currentRound": 12,
-  "updatedAt": "2026-11-23T16:58:31.644921+03:00",
+  "updatedAt": "2026-11-24T17:30:09.379672+03:00",
   "standings": [
     {
       "rank": 1,
@@ -749,6 +749,130 @@
     },
     {
       "rank": 7,
+      "clubId": "basaksehir",
+      "clubName": "Başakşehir",
+      "shortName": "BFK",
+      "logo": "https://highlightly.net/soccer/images/teams/480748.png",
+      "overall": {
+        "played": 12,
+        "won": 6,
+        "drawn": 2,
+        "lost": 4,
+        "goalsFor": 23,
+        "goalsAgainst": 19,
+        "goalDifference": 4,
+        "points": 20
+      },
+      "home": {
+        "played": 7,
+        "won": 5,
+        "drawn": 1,
+        "lost": 1,
+        "goalsFor": 20,
+        "goalsAgainst": 9,
+        "goalDifference": 11,
+        "points": 16
+      },
+      "away": {
+        "played": 5,
+        "won": 1,
+        "drawn": 1,
+        "lost": 3,
+        "goalsFor": 3,
+        "goalsAgainst": 10,
+        "goalDifference": -7,
+        "points": 4
+      },
+      "form": [
+        "W",
+        "W",
+        "W",
+        "L",
+        "W"
+      ],
+      "recentMatches": [
+        {
+          "matchId": "hl-basaksehir-corumspor-r12",
+          "result": "W",
+          "opponentClubId": "corumspor",
+          "opponentName": "Çorum FK",
+          "score": "4-2",
+          "isHome": true
+        },
+        {
+          "matchId": "hl-goztepe-basaksehir-r11",
+          "result": "W",
+          "opponentClubId": "goztepe",
+          "opponentName": "Göztepe",
+          "score": "1-2",
+          "isHome": false
+        },
+        {
+          "matchId": "hl-basaksehir-samsunspor-r10",
+          "result": "W",
+          "opponentClubId": "samsunspor",
+          "opponentName": "Samsunspor",
+          "score": "5-2",
+          "isHome": true
+        },
+        {
+          "matchId": "hl-besiktas-basaksehir-r9",
+          "result": "L",
+          "opponentClubId": "besiktas",
+          "opponentName": "Beşiktaş",
+          "score": "2-0",
+          "isHome": false
+        },
+        {
+          "matchId": "hl-basaksehir-gaziantep-fk-r8",
+          "result": "W",
+          "opponentClubId": "gaziantep-fk",
+          "opponentName": "Gaziantep FK",
+          "score": "2-1",
+          "isHome": true
+        }
+      ],
+      "seasonTrends": [
+        {
+          "season": "2023",
+          "rank": 4,
+          "points": 61,
+          "goalsFor": 57,
+          "goalsAgainst": 43,
+          "ppg": 1.61,
+          "xgDiff": 1.1
+        },
+        {
+          "season": "2024",
+          "rank": 5,
+          "points": 54,
+          "goalsFor": 60,
+          "goalsAgainst": 54,
+          "ppg": 1.54,
+          "xgDiff": 0.5
+        },
+        {
+          "season": "2025",
+          "rank": 5,
+          "points": 57,
+          "goalsFor": 58,
+          "goalsAgainst": 35,
+          "ppg": 1.68,
+          "xgDiff": 1.8
+        },
+        {
+          "season": "2026 (12H)",
+          "rank": 7,
+          "points": 20,
+          "goalsFor": 23,
+          "goalsAgainst": 19,
+          "ppg": 1.67,
+          "xgDiff": 0.6
+        }
+      ]
+    },
+    {
+      "rank": 8,
       "clubId": "kocaelispor",
       "clubName": "Kocaelispor FK",
       "shortName": "KOC",
@@ -862,7 +986,7 @@
         },
         {
           "season": "2026 (12H)",
-          "rank": 7,
+          "rank": 8,
           "points": 20,
           "goalsFor": 15,
           "goalsAgainst": 11,
@@ -872,7 +996,7 @@
       ]
     },
     {
-      "rank": 8,
+      "rank": 9,
       "clubId": "goztepe",
       "clubName": "Göztepe",
       "shortName": "GÖZ",
@@ -986,136 +1110,12 @@
         },
         {
           "season": "2026 (12H)",
-          "rank": 8,
+          "rank": 9,
           "points": 18,
           "goalsFor": 23,
           "goalsAgainst": 19,
           "ppg": 1.5,
           "xgDiff": 0.6
-        }
-      ]
-    },
-    {
-      "rank": 9,
-      "clubId": "basaksehir",
-      "clubName": "Başakşehir",
-      "shortName": "BFK",
-      "logo": "https://highlightly.net/soccer/images/teams/480748.png",
-      "overall": {
-        "played": 11,
-        "won": 5,
-        "drawn": 2,
-        "lost": 4,
-        "goalsFor": 19,
-        "goalsAgainst": 17,
-        "goalDifference": 2,
-        "points": 17
-      },
-      "home": {
-        "played": 6,
-        "won": 4,
-        "drawn": 1,
-        "lost": 1,
-        "goalsFor": 16,
-        "goalsAgainst": 7,
-        "goalDifference": 9,
-        "points": 13
-      },
-      "away": {
-        "played": 5,
-        "won": 1,
-        "drawn": 1,
-        "lost": 3,
-        "goalsFor": 3,
-        "goalsAgainst": 10,
-        "goalDifference": -7,
-        "points": 4
-      },
-      "form": [
-        "W",
-        "W",
-        "L",
-        "W",
-        "D"
-      ],
-      "recentMatches": [
-        {
-          "matchId": "hl-goztepe-basaksehir-r11",
-          "result": "W",
-          "opponentClubId": "goztepe",
-          "opponentName": "Göztepe",
-          "score": "1-2",
-          "isHome": false
-        },
-        {
-          "matchId": "hl-basaksehir-samsunspor-r10",
-          "result": "W",
-          "opponentClubId": "samsunspor",
-          "opponentName": "Samsunspor",
-          "score": "5-2",
-          "isHome": true
-        },
-        {
-          "matchId": "hl-besiktas-basaksehir-r9",
-          "result": "L",
-          "opponentClubId": "besiktas",
-          "opponentName": "Beşiktaş",
-          "score": "2-0",
-          "isHome": false
-        },
-        {
-          "matchId": "hl-basaksehir-gaziantep-fk-r8",
-          "result": "W",
-          "opponentClubId": "gaziantep-fk",
-          "opponentName": "Gaziantep FK",
-          "score": "2-1",
-          "isHome": true
-        },
-        {
-          "matchId": "hl-konyaspor-basaksehir-r7",
-          "result": "D",
-          "opponentClubId": "konyaspor",
-          "opponentName": "Konyaspor",
-          "score": "0-0",
-          "isHome": false
-        }
-      ],
-      "seasonTrends": [
-        {
-          "season": "2023",
-          "rank": 4,
-          "points": 61,
-          "goalsFor": 57,
-          "goalsAgainst": 43,
-          "ppg": 1.61,
-          "xgDiff": 1.1
-        },
-        {
-          "season": "2024",
-          "rank": 5,
-          "points": 54,
-          "goalsFor": 60,
-          "goalsAgainst": 54,
-          "ppg": 1.54,
-          "xgDiff": 0.5
-        },
-        {
-          "season": "2025",
-          "rank": 5,
-          "points": 57,
-          "goalsFor": 58,
-          "goalsAgainst": 35,
-          "ppg": 1.68,
-          "xgDiff": 1.8
-        },
-        {
-          "season": "2026 (11H)",
-          "rank": 9,
-          "points": 17,
-          "goalsFor": 19,
-          "goalsAgainst": 17,
-          "ppg": 1.55,
-          "xgDiff": 0.3
         }
       ]
     },
@@ -1250,13 +1250,13 @@
       "shortName": "ÇOR",
       "logo": "https://highlightly.net/soccer/images/teams/5398677.png",
       "overall": {
-        "played": 11,
+        "played": 12,
         "won": 5,
         "drawn": 1,
-        "lost": 5,
-        "goalsFor": 21,
-        "goalsAgainst": 21,
-        "goalDifference": 0,
+        "lost": 6,
+        "goalsFor": 23,
+        "goalsAgainst": 25,
+        "goalDifference": -2,
         "points": 16
       },
       "home": {
@@ -1270,23 +1270,31 @@
         "points": 6
       },
       "away": {
-        "played": 6,
+        "played": 7,
         "won": 3,
         "drawn": 1,
-        "lost": 2,
-        "goalsFor": 15,
-        "goalsAgainst": 12,
-        "goalDifference": 3,
+        "lost": 3,
+        "goalsFor": 17,
+        "goalsAgainst": 16,
+        "goalDifference": 1,
         "points": 10
       },
       "form": [
         "L",
-        "W",
         "L",
         "W",
+        "L",
         "W"
       ],
       "recentMatches": [
+        {
+          "matchId": "hl-basaksehir-corumspor-r12",
+          "result": "L",
+          "opponentClubId": "basaksehir",
+          "opponentName": "Başakşehir",
+          "score": "4-2",
+          "isHome": false
+        },
         {
           "matchId": "hl-corumspor-fenerbahce-r11",
           "result": "L",
@@ -1318,14 +1326,6 @@
           "opponentName": "Çaykur Rizespor",
           "score": "2-1",
           "isHome": true
-        },
-        {
-          "matchId": "hl-gaziantep-fk-corumspor-r7",
-          "result": "W",
-          "opponentClubId": "gaziantep-fk",
-          "opponentName": "Gaziantep FK",
-          "score": "0-3",
-          "isHome": false
         }
       ],
       "seasonTrends": [
@@ -1357,13 +1357,13 @@
           "xgDiff": 1.1
         },
         {
-          "season": "2026 (11H)",
+          "season": "2026 (12H)",
           "rank": 11,
           "points": 16,
-          "goalsFor": 21,
-          "goalsAgainst": 21,
-          "ppg": 1.45,
-          "xgDiff": 0.0
+          "goalsFor": 23,
+          "goalsAgainst": 25,
+          "ppg": 1.33,
+          "xgDiff": -0.3
         }
       ]
     },

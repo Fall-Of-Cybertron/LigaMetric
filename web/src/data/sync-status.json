@@ -1,24 +1,17 @@
 {
-  "lastSyncedAt": "23.11.2026 16:58 TSİ",
-  "lastSyncedIso": "2026-11-23T16:58:31.644921+03:00",
+  "lastSyncedAt": "24.11.2026 17:30 TSİ",
+  "lastSyncedIso": "2026-11-24T17:30:09.379672+03:00",
   "season": "2026/27",
   "currentRound": 12,
-  "totalFinishedMatches": 107,
-  "detailedMatchesCount": 104,
+  "totalFinishedMatches": 108,
+  "detailedMatchesCount": 105,
   "pendingMatchesCount": 3,
   "completionPercent": 97.2,
   "highlightsCount": 102,
   "clubsWithRealSquads": 18,
-  "totalPlayersCount": 503,
-  "bronzeFilesCount": 584,
+  "totalPlayersCount": 505,
+  "bronzeFilesCount": 586,
   "upcomingKickoffs": [
-    {
-      "id": 1348382201,
-      "dateUtc": "2026-11-23T17:00:00.000Z",
-      "home": "İstanbul Başakşehir",
-      "away": "Yeni Çorumspor",
-      "state": "Not started"
-    },
     {
       "id": 1348394966,
       "dateUtc": "2026-11-27T17:00:00.000Z",
@@ -186,14 +179,37 @@
       "home": "Rizespor",
       "away": "İstanbul Başakşehir",
       "state": "Not started"
+    },
+    {
+      "id": 1348409433,
+      "dateUtc": "2026-12-13T13:00:00.000Z",
+      "home": "Goztepe",
+      "away": "Konyaspor",
+      "state": "Not started"
     }
   ],
   "rounds": [
     {
       "round": 12,
-      "totalMatches": 8,
-      "detailedMatches": 8,
+      "totalMatches": 9,
+      "detailedMatches": 9,
       "matches": [
+        {
+          "id": "hl-basaksehir-corumspor-r12",
+          "date": "2026-11-23",
+          "homeClubId": "basaksehir",
+          "homeClubName": "Başakşehir",
+          "awayClubId": "corumspor",
+          "awayClubName": "Çorum FK",
+          "homeScore": 4,
+          "awayScore": 2,
+          "hasFullDetails": true,
+          "hasLineup": true,
+          "hasHighlight": false,
+          "statsCount": 40,
+          "shotsCount": 37,
+          "eventsCount": 18
+        },
         {
           "id": "hl-trabzonspor-eyupspor-r12",
           "date": "2026-11-22",
@@ -2036,6 +2052,14 @@
       "detailedMatches": 11
     },
     {
+      "clubId": "basaksehir",
+      "clubName": "Başakşehir",
+      "squadCount": 27,
+      "hasRealSquad": true,
+      "playedMatches": 12,
+      "detailedMatches": 12
+    },
+    {
       "clubId": "kocaelispor",
       "clubName": "Kocaelispor FK",
       "squadCount": 28,
@@ -2052,14 +2076,6 @@
       "detailedMatches": 12
     },
     {
-      "clubId": "basaksehir",
-      "clubName": "Başakşehir",
-      "squadCount": 26,
-      "hasRealSquad": true,
-      "playedMatches": 11,
-      "detailedMatches": 11
-    },
-    {
       "clubId": "rizespor",
       "clubName": "Çaykur Rizespor",
       "squadCount": 27,
@@ -2070,10 +2086,10 @@
     {
       "clubId": "corumspor",
       "clubName": "Çorum FK",
-      "squadCount": 28,
+      "squadCount": 29,
       "hasRealSquad": true,
-      "playedMatches": 11,
-      "detailedMatches": 11
+      "playedMatches": 12,
+      "detailedMatches": 12
     },
     {
       "clubId": "genclerbirligi",
