@@ -1,7 +1,7 @@
 {
   "season": "2026/27",
-  "currentRound": 12,
-  "updatedAt": "2026-11-27T16:37:26.508339+03:00",
+  "currentRound": 13,
+  "updatedAt": "2026-11-27T23:37:14.174641+03:00",
   "standings": [
     {
       "rank": 1,
@@ -536,13 +536,21 @@
         "points": 13
       },
       "form": [
+        "L",
         "W",
         "W",
         "D",
-        "W",
         "W"
       ],
       "recentMatches": [
+        {
+          "matchId": "hl-rizespor-kasimpasa-r13",
+          "result": "L",
+          "opponentClubId": "rizespor",
+          "opponentName": "Çaykur Rizespor",
+          "score": "3-2",
+          "isHome": false
+        },
         {
           "matchId": "hl-kasimpasa-alanyaspor-r12",
           "result": "W",
@@ -574,14 +582,6 @@
           "opponentName": "Eyüpspor",
           "score": "0-1",
           "isHome": false
-        },
-        {
-          "matchId": "hl-kasimpasa-samsunspor-r8",
-          "result": "W",
-          "opponentClubId": "samsunspor",
-          "opponentName": "Samsunspor",
-          "score": "4-1",
-          "isHome": true
         }
       ],
       "seasonTrends": [
@@ -1158,11 +1158,19 @@
       "form": [
         "W",
         "W",
+        "W",
         "D",
-        "L",
         "L"
       ],
       "recentMatches": [
+        {
+          "matchId": "hl-rizespor-kasimpasa-r13",
+          "result": "W",
+          "opponentClubId": "kasimpasa",
+          "opponentName": "Kasımpaşa",
+          "score": "3-2",
+          "isHome": true
+        },
         {
           "matchId": "hl-amed-rizespor-r12",
           "result": "W",
@@ -1194,14 +1202,6 @@
           "opponentName": "Trabzonspor",
           "score": "3-4",
           "isHome": true
-        },
-        {
-          "matchId": "hl-corumspor-rizespor-r8",
-          "result": "L",
-          "opponentClubId": "corumspor",
-          "opponentName": "Çorum FK",
-          "score": "2-1",
-          "isHome": false
         }
       ],
       "seasonTrends": [
@@ -1660,6 +1660,14 @@
       ],
       "recentMatches": [
         {
+          "matchId": "hl-alanyaspor-konyaspor-r13",
+          "result": "L",
+          "opponentClubId": "konyaspor",
+          "opponentName": "Konyaspor",
+          "score": "1-2",
+          "isHome": true
+        },
+        {
           "matchId": "hl-kasimpasa-alanyaspor-r12",
           "result": "L",
           "opponentClubId": "kasimpasa",
@@ -1690,14 +1698,6 @@
           "opponentName": "Kocaelispor FK",
           "score": "1-2",
           "isHome": true
-        },
-        {
-          "matchId": "hl-fenerbahce-alanyaspor-r8",
-          "result": "L",
-          "opponentClubId": "fenerbahce",
-          "opponentName": "Fenerbahçe",
-          "score": "3-0",
-          "isHome": false
         }
       ],
       "seasonTrends": [
@@ -1776,13 +1776,21 @@
         "points": 1
       },
       "form": [
-        "L",
-        "L",
-        "L",
         "W",
-        "L"
+        "L",
+        "L",
+        "L",
+        "W"
       ],
       "recentMatches": [
+        {
+          "matchId": "hl-alanyaspor-konyaspor-r13",
+          "result": "W",
+          "opponentClubId": "alanyaspor",
+          "opponentName": "Alanyaspor",
+          "score": "1-2",
+          "isHome": false
+        },
         {
           "matchId": "hl-konyaspor-besiktas-r12",
           "result": "L",
@@ -1814,14 +1822,6 @@
           "opponentName": "Gençlerbirliği",
           "score": "2-0",
           "isHome": true
-        },
-        {
-          "matchId": "hl-amed-konyaspor-r8",
-          "result": "L",
-          "opponentClubId": "amed",
-          "opponentName": "Amed SK",
-          "score": "1-0",
-          "isHome": false
         }
       ],
       "seasonTrends": [

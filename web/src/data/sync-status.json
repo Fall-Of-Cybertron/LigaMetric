@@ -1,31 +1,17 @@
 {
-  "lastSyncedAt": "27.11.2026 16:37 TSİ",
-  "lastSyncedIso": "2026-11-27T16:37:26.508339+03:00",
+  "lastSyncedAt": "27.11.2026 23:37 TSİ",
+  "lastSyncedIso": "2026-11-27T23:37:14.174641+03:00",
   "season": "2026/27",
-  "currentRound": 12,
-  "totalFinishedMatches": 108,
-  "detailedMatchesCount": 105,
+  "currentRound": 13,
+  "totalFinishedMatches": 110,
+  "detailedMatchesCount": 107,
   "pendingMatchesCount": 3,
-  "completionPercent": 97.2,
-  "highlightsCount": 102,
+  "completionPercent": 97.3,
+  "highlightsCount": 103,
   "clubsWithRealSquads": 18,
-  "totalPlayersCount": 505,
-  "bronzeFilesCount": 1126,
+  "totalPlayersCount": 506,
+  "bronzeFilesCount": 1130,
   "upcomingKickoffs": [
-    {
-      "id": 1348394966,
-      "dateUtc": "2026-11-27T17:00:00.000Z",
-      "home": "Rizespor",
-      "away": "Kasımpaşa",
-      "state": "Not started"
-    },
-    {
-      "id": 1348389009,
-      "dateUtc": "2026-11-27T17:00:00.000Z",
-      "home": "Alanyaspor",
-      "away": "Konyaspor",
-      "state": "Not started"
-    },
     {
       "id": 1348395817,
       "dateUtc": "2026-11-28T13:00:00.000Z",
@@ -186,9 +172,62 @@
       "home": "Goztepe",
       "away": "Konyaspor",
       "state": "Not started"
+    },
+    {
+      "id": 1348407731,
+      "dateUtc": "2026-12-13T16:00:00.000Z",
+      "home": "Fenerbahce",
+      "away": "Trabzonspor",
+      "state": "Not started"
+    },
+    {
+      "id": 1348408582,
+      "dateUtc": "2026-12-14T17:00:00.000Z",
+      "home": "Gazişehir Gaziantep",
+      "away": "Besiktas",
+      "state": "Not started"
     }
   ],
   "rounds": [
+    {
+      "round": 13,
+      "totalMatches": 2,
+      "detailedMatches": 2,
+      "matches": [
+        {
+          "id": "hl-rizespor-kasimpasa-r13",
+          "date": "2026-11-27",
+          "homeClubId": "rizespor",
+          "homeClubName": "Çaykur Rizespor",
+          "awayClubId": "kasimpasa",
+          "awayClubName": "Kasımpaşa",
+          "homeScore": 3,
+          "awayScore": 2,
+          "hasFullDetails": true,
+          "hasLineup": true,
+          "hasHighlight": true,
+          "statsCount": 40,
+          "shotsCount": 30,
+          "eventsCount": 18
+        },
+        {
+          "id": "hl-alanyaspor-konyaspor-r13",
+          "date": "2026-11-27",
+          "homeClubId": "alanyaspor",
+          "homeClubName": "Alanyaspor",
+          "awayClubId": "konyaspor",
+          "awayClubName": "Konyaspor",
+          "homeScore": 1,
+          "awayScore": 2,
+          "hasFullDetails": true,
+          "hasLineup": true,
+          "hasHighlight": false,
+          "statsCount": 40,
+          "shotsCount": 22,
+          "eventsCount": 20
+        }
+      ]
+    },
     {
       "round": 12,
       "totalMatches": 9,
@@ -374,7 +413,7 @@
           "hasLineup": true,
           "hasHighlight": true,
           "statsCount": 40,
-          "shotsCount": 35,
+          "shotsCount": 34,
           "eventsCount": 11
         },
         {
@@ -509,7 +548,7 @@
           "hasLineup": true,
           "hasHighlight": true,
           "statsCount": 40,
-          "shotsCount": 21,
+          "shotsCount": 20,
           "eventsCount": 19
         },
         {
@@ -1948,7 +1987,7 @@
           "hasLineup": true,
           "hasHighlight": true,
           "statsCount": 40,
-          "shotsCount": 24,
+          "shotsCount": 23,
           "eventsCount": 18
         },
         {
@@ -2040,8 +2079,8 @@
       "clubName": "Kasımpaşa",
       "squadCount": 29,
       "hasRealSquad": true,
-      "playedMatches": 12,
-      "detailedMatches": 12
+      "playedMatches": 13,
+      "detailedMatches": 13
     },
     {
       "clubId": "fenerbahce",
@@ -2078,10 +2117,10 @@
     {
       "clubId": "rizespor",
       "clubName": "Çaykur Rizespor",
-      "squadCount": 27,
+      "squadCount": 28,
       "hasRealSquad": true,
-      "playedMatches": 12,
-      "detailedMatches": 11
+      "playedMatches": 13,
+      "detailedMatches": 12
     },
     {
       "clubId": "corumspor",
@@ -2112,16 +2151,16 @@
       "clubName": "Alanyaspor",
       "squadCount": 27,
       "hasRealSquad": true,
-      "playedMatches": 12,
-      "detailedMatches": 12
+      "playedMatches": 13,
+      "detailedMatches": 13
     },
     {
       "clubId": "konyaspor",
       "clubName": "Konyaspor",
       "squadCount": 28,
       "hasRealSquad": true,
-      "playedMatches": 12,
-      "detailedMatches": 12
+      "playedMatches": 13,
+      "detailedMatches": 13
     },
     {
       "clubId": "gaziantep-fk",
