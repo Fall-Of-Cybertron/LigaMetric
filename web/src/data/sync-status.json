@@ -1,6 +1,6 @@
 {
-  "lastSyncedAt": "27.11.2026 23:37 TSİ",
-  "lastSyncedIso": "2026-11-27T23:37:14.174641+03:00",
+  "lastSyncedAt": "28.11.2026 15:45 TSİ",
+  "lastSyncedIso": "2026-11-28T15:45:13.676543+03:00",
   "season": "2026/27",
   "currentRound": 13,
   "totalFinishedMatches": 110,
@@ -10,7 +10,7 @@
   "highlightsCount": 103,
   "clubsWithRealSquads": 18,
   "totalPlayersCount": 506,
-  "bronzeFilesCount": 1130,
+  "bronzeFilesCount": 1230,
   "upcomingKickoffs": [
     {
       "id": 1348395817,
@@ -2107,19 +2107,19 @@
       "detailedMatches": 12
     },
     {
-      "clubId": "goztepe",
-      "clubName": "Göztepe",
-      "squadCount": 26,
-      "hasRealSquad": true,
-      "playedMatches": 12,
-      "detailedMatches": 12
-    },
-    {
       "clubId": "rizespor",
       "clubName": "Çaykur Rizespor",
       "squadCount": 28,
       "hasRealSquad": true,
       "playedMatches": 13,
+      "detailedMatches": 12
+    },
+    {
+      "clubId": "goztepe",
+      "clubName": "Göztepe",
+      "squadCount": 26,
+      "hasRealSquad": true,
+      "playedMatches": 12,
       "detailedMatches": 12
     },
     {
