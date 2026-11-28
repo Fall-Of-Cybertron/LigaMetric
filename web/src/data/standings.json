@@ -1,7 +1,7 @@
 {
   "season": "2026/27",
   "currentRound": 13,
-  "updatedAt": "2026-11-28T15:45:13.676543+03:00",
+  "updatedAt": "2026-11-28T22:23:58.271863+03:00",
   "standings": [
     {
       "rank": 1,
@@ -412,13 +412,21 @@
         "points": 5
       },
       "form": [
-        "L",
-        "L",
         "W",
+        "L",
+        "L",
         "W",
         "W"
       ],
       "recentMatches": [
+        {
+          "matchId": "hl-gaziantep-fk-amed-r13",
+          "result": "W",
+          "opponentClubId": "gaziantep-fk",
+          "opponentName": "Gaziantep FK",
+          "score": "1-2",
+          "isHome": false
+        },
         {
           "matchId": "hl-amed-rizespor-r12",
           "result": "L",
@@ -450,14 +458,6 @@
           "opponentName": "Samsunspor",
           "score": "1-2",
           "isHome": false
-        },
-        {
-          "matchId": "hl-amed-konyaspor-r8",
-          "result": "W",
-          "opponentClubId": "konyaspor",
-          "opponentName": "Konyaspor",
-          "score": "1-0",
-          "isHome": true
         }
       ],
       "seasonTrends": [
@@ -1369,130 +1369,6 @@
     },
     {
       "rank": 12,
-      "clubId": "genclerbirligi",
-      "clubName": "Gençlerbirliği",
-      "shortName": "GB",
-      "logo": "https://highlightly.net/soccer/images/teams/849231.png",
-      "overall": {
-        "played": 12,
-        "won": 4,
-        "drawn": 2,
-        "lost": 6,
-        "goalsFor": 13,
-        "goalsAgainst": 21,
-        "goalDifference": -8,
-        "points": 14
-      },
-      "home": {
-        "played": 7,
-        "won": 3,
-        "drawn": 2,
-        "lost": 2,
-        "goalsFor": 12,
-        "goalsAgainst": 7,
-        "goalDifference": 5,
-        "points": 11
-      },
-      "away": {
-        "played": 5,
-        "won": 1,
-        "drawn": 0,
-        "lost": 4,
-        "goalsFor": 1,
-        "goalsAgainst": 14,
-        "goalDifference": -13,
-        "points": 3
-      },
-      "form": [
-        "W",
-        "L",
-        "W",
-        "L",
-        "L"
-      ],
-      "recentMatches": [
-        {
-          "matchId": "hl-genclerbirligi-gaziantep-fk-r12",
-          "result": "W",
-          "opponentClubId": "gaziantep-fk",
-          "opponentName": "Gaziantep FK",
-          "score": "1-0",
-          "isHome": true
-        },
-        {
-          "matchId": "hl-besiktas-genclerbirligi-r11",
-          "result": "L",
-          "opponentClubId": "besiktas",
-          "opponentName": "Beşiktaş",
-          "score": "3-0",
-          "isHome": false
-        },
-        {
-          "matchId": "hl-genclerbirligi-alanyaspor-r10",
-          "result": "W",
-          "opponentClubId": "alanyaspor",
-          "opponentName": "Alanyaspor",
-          "score": "5-0",
-          "isHome": true
-        },
-        {
-          "matchId": "hl-konyaspor-genclerbirligi-r9",
-          "result": "L",
-          "opponentClubId": "konyaspor",
-          "opponentName": "Konyaspor",
-          "score": "2-0",
-          "isHome": false
-        },
-        {
-          "matchId": "hl-genclerbirligi-galatasaray-r8",
-          "result": "L",
-          "opponentClubId": "galatasaray",
-          "opponentName": "Galatasaray",
-          "score": "0-1",
-          "isHome": true
-        }
-      ],
-      "seasonTrends": [
-        {
-          "season": "2023",
-          "rank": 12,
-          "points": 45,
-          "goalsFor": 42,
-          "goalsAgainst": 46,
-          "ppg": 1.18,
-          "xgDiff": -0.8
-        },
-        {
-          "season": "2024",
-          "rank": 10,
-          "points": 50,
-          "goalsFor": 48,
-          "goalsAgainst": 44,
-          "ppg": 1.32,
-          "xgDiff": 0.4
-        },
-        {
-          "season": "2025",
-          "rank": 14,
-          "points": 34,
-          "goalsFor": 36,
-          "goalsAgainst": 47,
-          "ppg": 1.0,
-          "xgDiff": -0.9
-        },
-        {
-          "season": "2026 (12H)",
-          "rank": 12,
-          "points": 14,
-          "goalsFor": 13,
-          "goalsAgainst": 21,
-          "ppg": 1.17,
-          "xgDiff": -1.2
-        }
-      ]
-    },
-    {
-      "rank": 13,
       "clubId": "erzurumspor",
       "clubName": "Erzurumspor FK",
       "shortName": "ERZ",
@@ -1606,12 +1482,136 @@
         },
         {
           "season": "2026 (12H)",
-          "rank": 13,
+          "rank": 12,
           "points": 14,
           "goalsFor": 10,
           "goalsAgainst": 18,
           "ppg": 1.17,
           "xgDiff": -1.2
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "clubId": "genclerbirligi",
+      "clubName": "Gençlerbirliği",
+      "shortName": "GB",
+      "logo": "https://highlightly.net/soccer/images/teams/849231.png",
+      "overall": {
+        "played": 13,
+        "won": 4,
+        "drawn": 2,
+        "lost": 7,
+        "goalsFor": 14,
+        "goalsAgainst": 24,
+        "goalDifference": -10,
+        "points": 14
+      },
+      "home": {
+        "played": 7,
+        "won": 3,
+        "drawn": 2,
+        "lost": 2,
+        "goalsFor": 12,
+        "goalsAgainst": 7,
+        "goalDifference": 5,
+        "points": 11
+      },
+      "away": {
+        "played": 6,
+        "won": 1,
+        "drawn": 0,
+        "lost": 5,
+        "goalsFor": 2,
+        "goalsAgainst": 17,
+        "goalDifference": -15,
+        "points": 3
+      },
+      "form": [
+        "L",
+        "W",
+        "L",
+        "W",
+        "L"
+      ],
+      "recentMatches": [
+        {
+          "matchId": "hl-samsunspor-genclerbirligi-r13",
+          "result": "L",
+          "opponentClubId": "samsunspor",
+          "opponentName": "Samsunspor",
+          "score": "3-1",
+          "isHome": false
+        },
+        {
+          "matchId": "hl-genclerbirligi-gaziantep-fk-r12",
+          "result": "W",
+          "opponentClubId": "gaziantep-fk",
+          "opponentName": "Gaziantep FK",
+          "score": "1-0",
+          "isHome": true
+        },
+        {
+          "matchId": "hl-besiktas-genclerbirligi-r11",
+          "result": "L",
+          "opponentClubId": "besiktas",
+          "opponentName": "Beşiktaş",
+          "score": "3-0",
+          "isHome": false
+        },
+        {
+          "matchId": "hl-genclerbirligi-alanyaspor-r10",
+          "result": "W",
+          "opponentClubId": "alanyaspor",
+          "opponentName": "Alanyaspor",
+          "score": "5-0",
+          "isHome": true
+        },
+        {
+          "matchId": "hl-konyaspor-genclerbirligi-r9",
+          "result": "L",
+          "opponentClubId": "konyaspor",
+          "opponentName": "Konyaspor",
+          "score": "2-0",
+          "isHome": false
+        }
+      ],
+      "seasonTrends": [
+        {
+          "season": "2023",
+          "rank": 12,
+          "points": 45,
+          "goalsFor": 42,
+          "goalsAgainst": 46,
+          "ppg": 1.18,
+          "xgDiff": -0.8
+        },
+        {
+          "season": "2024",
+          "rank": 10,
+          "points": 50,
+          "goalsFor": 48,
+          "goalsAgainst": 44,
+          "ppg": 1.32,
+          "xgDiff": 0.4
+        },
+        {
+          "season": "2025",
+          "rank": 14,
+          "points": 34,
+          "goalsFor": 36,
+          "goalsAgainst": 47,
+          "ppg": 1.0,
+          "xgDiff": -0.9
+        },
+        {
+          "season": "2026 (13H)",
+          "rank": 13,
+          "points": 14,
+          "goalsFor": 14,
+          "goalsAgainst": 24,
+          "ppg": 1.08,
+          "xgDiff": -1.5
         }
       ]
     },
@@ -1865,6 +1865,130 @@
     },
     {
       "rank": 16,
+      "clubId": "samsunspor",
+      "clubName": "Samsunspor",
+      "shortName": "SAM",
+      "logo": "https://highlightly.net/soccer/images/teams/3066937.png",
+      "overall": {
+        "played": 13,
+        "won": 3,
+        "drawn": 1,
+        "lost": 9,
+        "goalsFor": 15,
+        "goalsAgainst": 29,
+        "goalDifference": -14,
+        "points": 10
+      },
+      "home": {
+        "played": 7,
+        "won": 2,
+        "drawn": 1,
+        "lost": 4,
+        "goalsFor": 9,
+        "goalsAgainst": 16,
+        "goalDifference": -7,
+        "points": 7
+      },
+      "away": {
+        "played": 6,
+        "won": 1,
+        "drawn": 0,
+        "lost": 5,
+        "goalsFor": 6,
+        "goalsAgainst": 13,
+        "goalDifference": -7,
+        "points": 3
+      },
+      "form": [
+        "W",
+        "L",
+        "W",
+        "L",
+        "L"
+      ],
+      "recentMatches": [
+        {
+          "matchId": "hl-samsunspor-genclerbirligi-r13",
+          "result": "W",
+          "opponentClubId": "genclerbirligi",
+          "opponentName": "Gençlerbirliği",
+          "score": "3-1",
+          "isHome": true
+        },
+        {
+          "matchId": "hl-galatasaray-samsunspor-r12",
+          "result": "L",
+          "opponentClubId": "galatasaray",
+          "opponentName": "Galatasaray",
+          "score": "2-1",
+          "isHome": false
+        },
+        {
+          "matchId": "hl-samsunspor-konyaspor-r11",
+          "result": "W",
+          "opponentClubId": "konyaspor",
+          "opponentName": "Konyaspor",
+          "score": "1-0",
+          "isHome": true
+        },
+        {
+          "matchId": "hl-basaksehir-samsunspor-r10",
+          "result": "L",
+          "opponentClubId": "basaksehir",
+          "opponentName": "Başakşehir",
+          "score": "5-2",
+          "isHome": false
+        },
+        {
+          "matchId": "hl-samsunspor-amed-r9",
+          "result": "L",
+          "opponentClubId": "amed",
+          "opponentName": "Amed SK",
+          "score": "1-2",
+          "isHome": true
+        }
+      ],
+      "seasonTrends": [
+        {
+          "season": "2023",
+          "rank": 13,
+          "points": 43,
+          "goalsFor": 42,
+          "goalsAgainst": 52,
+          "ppg": 1.13,
+          "xgDiff": -0.8
+        },
+        {
+          "season": "2024",
+          "rank": 3,
+          "points": 61,
+          "goalsFor": 53,
+          "goalsAgainst": 40,
+          "ppg": 1.74,
+          "xgDiff": 1.0
+        },
+        {
+          "season": "2025",
+          "rank": 7,
+          "points": 51,
+          "goalsFor": 46,
+          "goalsAgainst": 45,
+          "ppg": 1.5,
+          "xgDiff": 0.1
+        },
+        {
+          "season": "2026 (13H)",
+          "rank": 16,
+          "points": 10,
+          "goalsFor": 15,
+          "goalsAgainst": 29,
+          "ppg": 0.77,
+          "xgDiff": -2.1
+        }
+      ]
+    },
+    {
+      "rank": 17,
       "clubId": "gaziantep-fk",
       "clubName": "Gaziantep FK",
       "shortName": "GFK",
@@ -1908,6 +2032,14 @@
       ],
       "recentMatches": [
         {
+          "matchId": "hl-gaziantep-fk-amed-r13",
+          "result": "L",
+          "opponentClubId": "amed",
+          "opponentName": "Amed SK",
+          "score": "1-2",
+          "isHome": true
+        },
+        {
           "matchId": "hl-genclerbirligi-gaziantep-fk-r12",
           "result": "L",
           "opponentClubId": "genclerbirligi",
@@ -1938,14 +2070,6 @@
           "opponentName": "Erzurumspor FK",
           "score": "1-3",
           "isHome": true
-        },
-        {
-          "matchId": "hl-basaksehir-gaziantep-fk-r8",
-          "result": "L",
-          "opponentClubId": "basaksehir",
-          "opponentName": "Başakşehir",
-          "score": "2-1",
-          "isHome": false
         }
       ],
       "seasonTrends": [
@@ -1978,136 +2102,12 @@
         },
         {
           "season": "2026 (12H)",
-          "rank": 16,
+          "rank": 17,
           "points": 8,
           "goalsFor": 9,
           "goalsAgainst": 20,
           "ppg": 0.67,
           "xgDiff": -1.6
-        }
-      ]
-    },
-    {
-      "rank": 17,
-      "clubId": "samsunspor",
-      "clubName": "Samsunspor",
-      "shortName": "SAM",
-      "logo": "https://highlightly.net/soccer/images/teams/3066937.png",
-      "overall": {
-        "played": 12,
-        "won": 2,
-        "drawn": 1,
-        "lost": 9,
-        "goalsFor": 12,
-        "goalsAgainst": 28,
-        "goalDifference": -16,
-        "points": 7
-      },
-      "home": {
-        "played": 6,
-        "won": 1,
-        "drawn": 1,
-        "lost": 4,
-        "goalsFor": 6,
-        "goalsAgainst": 15,
-        "goalDifference": -9,
-        "points": 4
-      },
-      "away": {
-        "played": 6,
-        "won": 1,
-        "drawn": 0,
-        "lost": 5,
-        "goalsFor": 6,
-        "goalsAgainst": 13,
-        "goalDifference": -7,
-        "points": 3
-      },
-      "form": [
-        "L",
-        "W",
-        "L",
-        "L",
-        "L"
-      ],
-      "recentMatches": [
-        {
-          "matchId": "hl-galatasaray-samsunspor-r12",
-          "result": "L",
-          "opponentClubId": "galatasaray",
-          "opponentName": "Galatasaray",
-          "score": "2-1",
-          "isHome": false
-        },
-        {
-          "matchId": "hl-samsunspor-konyaspor-r11",
-          "result": "W",
-          "opponentClubId": "konyaspor",
-          "opponentName": "Konyaspor",
-          "score": "1-0",
-          "isHome": true
-        },
-        {
-          "matchId": "hl-basaksehir-samsunspor-r10",
-          "result": "L",
-          "opponentClubId": "basaksehir",
-          "opponentName": "Başakşehir",
-          "score": "5-2",
-          "isHome": false
-        },
-        {
-          "matchId": "hl-samsunspor-amed-r9",
-          "result": "L",
-          "opponentClubId": "amed",
-          "opponentName": "Amed SK",
-          "score": "1-2",
-          "isHome": true
-        },
-        {
-          "matchId": "hl-kasimpasa-samsunspor-r8",
-          "result": "L",
-          "opponentClubId": "kasimpasa",
-          "opponentName": "Kasımpaşa",
-          "score": "4-1",
-          "isHome": false
-        }
-      ],
-      "seasonTrends": [
-        {
-          "season": "2023",
-          "rank": 13,
-          "points": 43,
-          "goalsFor": 42,
-          "goalsAgainst": 52,
-          "ppg": 1.13,
-          "xgDiff": -0.8
-        },
-        {
-          "season": "2024",
-          "rank": 3,
-          "points": 61,
-          "goalsFor": 53,
-          "goalsAgainst": 40,
-          "ppg": 1.74,
-          "xgDiff": 1.0
-        },
-        {
-          "season": "2025",
-          "rank": 7,
-          "points": 51,
-          "goalsFor": 46,
-          "goalsAgainst": 45,
-          "ppg": 1.5,
-          "xgDiff": 0.1
-        },
-        {
-          "season": "2026 (12H)",
-          "rank": 17,
-          "points": 7,
-          "goalsFor": 12,
-          "goalsAgainst": 28,
-          "ppg": 0.58,
-          "xgDiff": -2.4
         }
       ]
     },
